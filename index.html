@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heart_Core_Final_Stable_v5.0.exe</title>
+    <title>Heart_OS_v6.0_Final_Build.exe</title>
     
-    <!-- Librerías Externas -->
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&family=Plus+Jakarta+Sans:wght@200;400;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- Librerías de Alto Rendimiento -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -14,73 +14,103 @@
 
     <style>
         :root {
-            --bg: #020408;
+            --bg: #010204;
+            --surface: #0a0c10;
             --accent-cyan: #00f2ff;
             --accent-pink: #ff2d55;
             --accent-green: #39ff14;
-            --glass: rgba(10, 15, 25, 0.7);
+            --accent-purple: #bc13fe;
+            --glass: rgba(15, 20, 30, 0.7);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --text: #e2e8f0;
+            --text-main: #f8fafc;
             --text-dim: #94a3b8;
+            --font-mono: 'Fira Code', monospace;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --glow-cyan: 0 0 20px rgba(0, 242, 255, 0.3);
+            --glow-pink: 0 0 20px rgba(255, 45, 85, 0.3);
         }
 
-        /* --- Reset & Base --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
+        /* --- Estilos Globales & Reset --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
         body {
             background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            font-family: var(--font-sans);
             overflow-x: hidden;
             scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
         }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 10px; }
+        /* --- Barra de Progreso Superior --- */
+        #scroll-progress {
+            position: fixed;
+            top: 0; left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-pink), var(--accent-purple));
+            z-index: 10000;
+            transition: width 0.1s;
+        }
 
-        /* --- Custom Loader (The Boot Sequence) --- */
+        /* --- Boot Sequence / Loader --- */
         #boot-screen {
             position: fixed;
             inset: 0;
             background: #000;
             z-index: 99999;
             padding: 40px;
-            font-family: 'Fira Code', monospace;
+            font-family: var(--font-mono);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        .boot-line { font-size: 13px; line-height: 1.5; margin-bottom: 4px; opacity: 0; }
-        .cyan { color: var(--accent-cyan); }
-        .pink { color: var(--accent-pink); }
-        .green { color: var(--accent-green); }
+        .boot-line { font-size: 13px; line-height: 1.6; margin-bottom: 2px; opacity: 0; color: #fff; }
+        .c-cyan { color: var(--accent-cyan); }
+        .c-pink { color: var(--accent-pink); }
+        .c-green { color: var(--accent-green); }
+        .c-purple { color: var(--accent-purple); }
 
-        /* --- Background Effects --- */
-        #matrix-canvas {
+        /* --- Background Matrix Canvas --- */
+        #matrix-bg {
             position: fixed;
             top: 0; left: 0; z-index: -1;
-            opacity: 0.25;
-            filter: blur(1px);
+            opacity: 0.15;
+            filter: blur(0.5px);
         }
 
-        .vignette {
+        .vignette-overlay {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.9) 100%);
             pointer-events: none;
             z-index: 10;
         }
 
-        /* --- Layout --- */
-        .wrapper {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 20px;
+        /* --- Custom Cursor --- */
+        #custom-cursor {
+            width: 20px; height: 20px;
+            background: rgba(0, 242, 255, 0.2);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 20000;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--accent-cyan);
+            display: none;
         }
 
-        /* --- Hero Section --- */
+        /* --- UI Wrapper --- */
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 30px;
+            position: relative;
+        }
+
+        /* --- Header Section --- */
         .hero {
             height: 100vh;
             display: flex;
@@ -88,498 +118,560 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            position: relative;
+            gap: 20px;
         }
 
-        .version-badge {
-            font-family: 'Fira Code';
-            background: rgba(0, 242, 255, 0.1);
+        .sys-badge {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 6px 18px;
+            border-radius: 100px;
+            background: rgba(0, 242, 255, 0.05);
             border: 1px solid var(--accent-cyan);
             color: var(--accent-cyan);
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-size: 12px;
-            margin-bottom: 20px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(0,242,255,0.2);
+            box-shadow: var(--glow-cyan);
+            animation: breathe 4s infinite ease-in-out;
+        }
+
+        .title-container {
+            position: relative;
+            margin-bottom: 20px;
         }
 
         .main-title {
-            font-size: clamp(3rem, 12vw, 6.5rem);
+            font-size: clamp(3rem, 15vw, 8rem);
             font-weight: 800;
-            letter-spacing: -4px;
-            line-height: 0.9;
-            margin-bottom: 20px;
+            letter-spacing: -6px;
+            line-height: 0.85;
             background: linear-gradient(180deg, #fff 0%, var(--accent-pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
         }
 
-        /* --- Characters Showcase (The Real Images) --- */
-        .character-vault {
+        /* --- Biometric Image Vault --- */
+        .bio-vault {
             display: flex;
             gap: 40px;
-            margin: 60px 0;
+            margin: 80px 0;
             width: 100%;
             justify-content: center;
-            perspective: 1000px;
+            perspective: 2000px;
         }
 
-        .char-card {
-            width: 280px;
-            height: 380px;
-            background: var(--glass);
+        .vault-card {
+            width: 320px;
+            height: 440px;
+            background: var(--surface);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            border-radius: 24px;
             position: relative;
             overflow: hidden;
-            transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            backdrop-filter: blur(10px);
+            transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            backdrop-filter: blur(15px);
         }
 
-        .char-card:hover {
-            transform: translateY(-10px) rotateY(10deg);
-            border-color: var(--card-color);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px var(--card-glow);
+        .vault-card:hover {
+            transform: translateY(-20px) rotateX(10deg);
+            border-color: var(--theme-color);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 30px var(--theme-glow);
         }
 
-        .char-img {
-            width: 100%;
-            height: 100%;
+        .vault-img {
+            width: 100%; height: 100%;
             object-fit: cover;
-            opacity: 0.8;
-            transition: 0.5s;
-            filter: grayscale(0.5);
+            opacity: 0.7;
+            transition: 0.6s;
+            filter: grayscale(0.4) brightness(0.8);
         }
 
-        .char-card:hover .char-img {
-            opacity: 1;
-            filter: grayscale(0);
-            transform: scale(1.1);
+        .vault-card:hover .vault-img {
+            opacity: 1; filter: grayscale(0) brightness(1);
+            transform: scale(1.05);
         }
 
-        .char-label {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.8);
-            padding: 10px;
-            border-radius: 8px;
-            font-family: 'Fira Code';
-            font-size: 12px;
-            border-left: 3px solid var(--card-color);
-        }
-
-        .scan-line {
+        .scan-laser {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 2px;
-            background: var(--card-color);
-            box-shadow: 0 0 10px var(--card-color);
-            animation: scan 3s infinite linear;
-            z-index: 5;
+            background: var(--theme-color);
+            box-shadow: 0 0 15px var(--theme-color);
+            animation: scanning 4s infinite linear;
+            z-index: 10;
         }
 
-        @keyframes scan {
-            0% { top: 0%; }
-            100% { top: 100%; }
-        }
+        @keyframes scanning { 0% { top: -5%; } 100% { top: 105%; } }
 
-        /* --- Terminal Unit --- */
-        .terminal-unit {
-            background: #000;
+        .vault-meta {
+            position: absolute;
+            bottom: 25px; left: 25px; right: 25px;
+            background: rgba(0,0,0,0.85);
+            padding: 15px;
             border-radius: 12px;
-            border: 1px solid #222;
-            padding: 20px;
-            margin-top: 40px;
-            width: 100%;
-            max-width: 600px;
-            font-family: 'Fira Code';
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-left: 4px solid var(--theme-color);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            z-index: 15;
+            backdrop-filter: blur(5px);
         }
 
-        /* --- Love API Documentation --- */
-        .api-section {
-            margin: 100px 0;
-            padding: 40px;
-            background: var(--glass);
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-        }
-
-        .api-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .api-method {
-            background: var(--accent-green);
-            color: #000;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-weight: 800;
-            font-size: 12px;
-        }
-
-        .api-endpoint {
-            font-family: 'Fira Code';
-            color: var(--accent-cyan);
-        }
-
-        /* --- Message Cards --- */
-        .message-grid {
+        /* --- Interactive Love Dashboard --- */
+        .dashboard {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-            margin: 80px 0;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 100px 0;
         }
 
-        .msg-card {
-            padding: 40px;
-            background: rgba(255,255,255,0.02);
-            border-left: 2px solid var(--accent-pink);
-            border-radius: 0 20px 20px 0;
+        .dash-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
             position: relative;
-            transition: 0.4s;
+            overflow: hidden;
         }
 
-        .msg-card:hover {
-            background: rgba(255,255,255,0.05);
-            transform: translateX(10px);
-        }
-
-        .msg-card p {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            color: #cbd5e1;
-            margin-bottom: 20px;
-        }
-
-        .code-piropo {
-            font-family: 'Fira Code';
+        .dash-card h3 {
+            font-family: var(--font-mono);
             font-size: 14px;
             color: var(--accent-cyan);
-            opacity: 0.6;
+            margin-bottom: 20px;
+            text-transform: uppercase;
         }
 
-        .dancing-title {
-            font-family: 'Dancing Script', cursive;
-            font-size: 6rem;
-            text-align: center;
+        .stat-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .stat-label { font-size: 12px; color: var(--text-dim); }
+        .stat-value { font-family: var(--font-mono); font-weight: 700; color: var(--accent-green); }
+
+        .health-bar-container {
+            width: 100%; height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-green));
+            width: 0%;
+            transition: width 2s cubic-bezier(0.1, 0, 0.2, 1);
+        }
+
+        /* --- Technical Love Docs --- */
+        .docs-section {
+            background: var(--surface);
+            border-radius: 30px;
+            padding: 60px;
             margin: 100px 0;
-            color: var(--accent-pink);
-            text-shadow: 0 0 30px rgba(255, 45, 85, 0.4);
+            border: 1px solid #1a1e26;
         }
 
-        /* --- Git Commit History --- */
-        .timeline {
-            position: relative;
-            padding-left: 40px;
+        .docs-header {
+            border-bottom: 1px solid #1a1e26;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        .method-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            background: var(--accent-pink);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .doc-paragraph {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+
+        /* --- GitHub Style Commits --- */
+        .commit-log {
             margin: 100px 0;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 1px;
-            background: #222;
+            padding-left: 30px;
+            border-left: 2px solid #1a1e26;
         }
 
         .commit-item {
             position: relative;
-            margin-bottom: 40px;
+            padding-bottom: 50px;
         }
 
-        .commit-dot {
+        .commit-item::before {
+            content: '';
             position: absolute;
-            left: -44px;
-            top: 5px;
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
+            left: -36px; top: 0;
+            width: 10px; height: 10px;
             background: var(--accent-green);
+            border-radius: 50%;
             box-shadow: 0 0 10px var(--accent-green);
         }
 
-        .commit-content {
+        .commit-card {
             background: #0d1117;
-            padding: 20px;
-            border-radius: 12px;
             border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 20px;
         }
 
-        /* --- Music Player UI --- */
-        .music-player {
+        .commit-card .title { font-family: var(--font-mono); font-size: 14px; color: #fff; margin-bottom: 8px; }
+        .commit-card .desc { font-size: 13px; color: var(--text-dim); }
+
+        /* --- Heartbeat Visualizer --- */
+        .visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 40px;
+            margin-top: 20px;
+        }
+
+        .vis-bar {
+            width: 4px;
+            background: var(--accent-pink);
+            border-radius: 2px;
+            animation: pulse-bar 1s infinite alternate;
+        }
+
+        @keyframes pulse-bar { 0% { height: 10%; } 100% { height: 100%; } }
+
+        /* --- Message Spotlight --- */
+        .spotlight-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(3rem, 10vw, 7rem);
+            text-align: center;
+            margin: 120px 0;
+            color: var(--accent-pink);
+            text-shadow: 0 0 40px rgba(255, 45, 85, 0.5);
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        /* --- Audio Player UI --- */
+        .player-floating {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 300px;
+            bottom: 40px; right: 40px;
+            width: 320px;
             background: var(--glass);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border);
             padding: 20px;
-            border-radius: 20px;
-            z-index: 1000;
+            border-radius: 24px;
+            z-index: 5000;
             display: flex;
             align-items: center;
             gap: 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .music-thumb {
-            width: 50px;
-            height: 50px;
-            background: var(--accent-pink);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse 2s infinite;
+        .album-art {
+            width: 60px; height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--accent-pink), var(--accent-purple));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #fff;
+            animation: spinning 8s infinite linear;
         }
 
-        @keyframes pulse { 0% { scale: 1; } 50% { scale: 1.1; } 100% { scale: 1; } }
+        @keyframes spinning { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- Footer --- */
+        /* --- Footer Button --- */
         footer {
-            padding: 100px 0;
+            padding: 150px 0 100px;
             text-align: center;
-            border-top: 1px solid #111;
         }
 
-        .deploy-button {
+        .mega-button {
             background: transparent;
             border: 2px solid var(--accent-cyan);
             color: var(--accent-cyan);
-            padding: 20px 45px;
-            border-radius: 12px;
-            font-family: 'Fira Code';
+            padding: 25px 60px;
+            font-family: var(--font-mono);
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.4s;
-            overflow: hidden;
+            font-size: 14px;
+            letter-spacing: 4px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: 0.5s cubic-bezier(0.2, 0, 0.2, 1);
             position: relative;
+            overflow: hidden;
         }
 
-        .deploy-button:hover {
+        .mega-button:hover {
             background: var(--accent-cyan);
             color: #000;
-            box-shadow: 0 0 40px var(--accent-cyan);
+            box-shadow: 0 0 50px var(--accent-cyan);
+            transform: translateY(-5px);
         }
 
-        /* --- Mobile --- */
+        .mega-button::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg); transition: 0.5s;
+        }
+
+        .mega-button:hover::after { left: 150%; }
+
+        /* --- Animations --- */
+        @keyframes breathe {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* --- Responsive --- */
         @media (max-width: 768px) {
-            .character-vault { flex-direction: column; align-items: center; }
-            .main-title { font-size: 3rem; }
-            .dancing-title { font-size: 4rem; }
-            .music-player { display: none; }
+            .bio-vault { flex-direction: column; align-items: center; }
+            .docs-section { padding: 30px; }
+            .dashboard { grid-template-columns: 1fr; }
+            .player-floating { display: none; }
+            .main-title { font-size: 3.5rem; letter-spacing: -2px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Escena de Booteo -->
+    <div id="scroll-progress"></div>
+    <div id="custom-cursor"></div>
     <div id="boot-screen"></div>
+    <canvas id="matrix-bg"></canvas>
+    <div class="vignette-overlay"></div>
 
-    <canvas id="matrix-canvas"></canvas>
-    <div class="vignette"></div>
-
-    <div class="wrapper" id="main-content" style="opacity: 0;">
+    <div id="main-content" style="opacity: 0; pointer-events: none;">
         
-        <!-- Header -->
-        <header class="hero">
-            <div class="version-badge">system state: infinite_love.stable</div>
-            <h1 class="main-title">Mi_Lugar_Favorito<br>.sys</h1>
-            <p style="color: var(--text-dim); font-family: 'Fira Code'; font-size: 0.9rem;">
-                Compiled with maximum devotion for you
-            </p>
-
-            <div class="character-vault">
-                <!-- Pingüino -->
-                <div class="char-card" style="--card-color: #00f2ff; --card-glow: rgba(0,242,255,0.3)">
-                    <div class="scan-line"></div>
-                    <!-- REEMPLAZA ESTA URL CON TU FOTO DEL PINGÜINO -->
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0t_G1jK-iG2Nq0G_5-0U_p6uR5D2Z-I_Vzg&s" alt="Pinguino" class="char-img">
-                    <div class="char-label">
-                        <span class="green">[BIO_AUTH]</span> Pinguino.unit <br>
-                        <span class="cyan">Status: Protegiéndote</span>
-                    </div>
+        <div class="wrapper">
+            
+            <!-- Hero Header -->
+            <header class="hero">
+                <div class="sys-badge" data-gsap="fade-down">CORE_ESTABLISHED: Feb_14_2024</div>
+                <div class="title-container" data-gsap="zoom-in">
+                    <h1 class="main-title">Heart_OS<br>v6.0</h1>
                 </div>
-
-                <!-- Tortuga -->
-                <div class="char-card" style="--card-color: #39ff14; --card-glow: rgba(57,255,20,0.3)">
-                    <div class="scan-line"></div>
-                    <!-- REEMPLAZA ESTA URL CON TU FOTO DE LA TORTUGA -->
-                    <img src="https://static.nationalgeographic.es/files/styles/image_3200/public/01-sea-turtles.jpg?w=1900&h=1267" alt="Tortuga" class="char-img">
-                    <div class="char-label">
-                        <span class="green">[BIO_AUTH]</span> Tortuga.unit <br>
-                        <span class="green">Status: Nadando a tu lado</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="terminal-unit">
-                <div style="display:flex; gap:8px; margin-bottom:15px;">
-                    <div style="width:10px; height:10px; border-radius:50%; background:#ff5f56"></div>
-                    <div style="width:10px; height:10px; border-radius:50%; background:#ffbd2e"></div>
-                    <div style="width:10px; height:10px; border-radius:50%; background:#27c93f"></div>
-                </div>
-                <div id="hero-terminal" style="color:var(--accent-green); font-size: 14px; text-align: left;"></div>
-            </div>
-        </header>
-
-        <main>
-            <!-- Sección de Mensajes -->
-            <section class="message-grid">
-                <div class="msg-card reveal">
-                    <div class="code-piropo">// sudo apt-get install felicidad_eterna</div>
-                    <p>Hoy, 14 de febrero, no quiero escribirte un simple mensaje… quiero escribirte una promesa envuelta en palabras, un abrazo convertido en letras, un pedacito de mi alma entregado en cada línea.</p>
-                </div>
-
-                <div class="dancing-title reveal">Te amo.</div>
-
-                <div class="msg-card reveal">
-                    <div class="code-piropo">while(true) { queriéndote++; }</div>
-                    <p>Y cuando lo digo, no lo digo como una frase bonita que se pierde en el aire. Lo digo como algo que nace profundo, que crece cada día, que late fuerte cuando pienso en ti. Te amo con la certeza de quien ha encontrado algo valioso.</p>
-                </div>
-
-                <div class="msg-card reveal">
-                    <div class="code-piropo">git commit -m "Mi corazón para siempre"</div>
-                    <p>Desde que llegaste a mi vida, todo tiene un brillo diferente. No hiciste magia… fuiste tú. Tu forma tan única de ser, tu esencia tan auténtica. Me enamoré de tu corazón, de tu mente, de tu luz.</p>
-                </div>
-            </section>
-
-            <!-- Sección Love API -->
-            <section class="api-section reveal">
-                <div class="api-header">
-                    <div class="api-method">GET</div>
-                    <div class="api-endpoint">/v1/heart/status</div>
-                </div>
-                <div style="font-family:'Fira Code'; font-size:14px; color:var(--text-dim); line-height:2;">
-                    { <br>
-                    &nbsp;&nbsp;"owner": "Tú", <br>
-                    &nbsp;&nbsp;"love_level": "Infinity", <br>
-                    &nbsp;&nbsp;"mood": "Extremadamente enamorado", <br>
-                    &nbsp;&nbsp;"future_plans": ["Reír contigo", "Cumplir sueños", "Cuidarnos"], <br>
-                    &nbsp;&nbsp;"is_happy": true <br>
-                    }
-                </div>
-            </section>
-
-            <!-- Historial de Commits -->
-            <h3 style="font-family:'Fira Code'; color:var(--accent-cyan); margin-bottom:30px;">[ RELATIONSHIP_CHANGELOG ]</h3>
-            <div class="timeline">
-                <div class="commit-item reveal">
-                    <div class="commit-dot"></div>
-                    <div class="commit-content">
-                        <span style="color:var(--accent-pink); font-size:12px;">feat: inicialización del sistema</span>
-                        <p style="margin-top:10px; font-size:14px; color:var(--text-dim);">El día que te conocí y mi mundo cambió de base de datos.</p>
-                    </div>
-                </div>
-                <div class="commit-item reveal">
-                    <div class="commit-dot"></div>
-                    <div class="commit-content">
-                        <span style="color:var(--accent-cyan); font-size:12px;">update: parches de risas infinitas</span>
-                        <p style="margin-top:10px; font-size:14px; color:var(--text-dim);">Actualización constante de momentos hermosos a tu lado.</p>
-                    </div>
-                </div>
-                <div class="commit-item reveal">
-                    <div class="commit-dot"></div>
-                    <div class="commit-content">
-                        <span style="color:var(--accent-green); font-size:12px;">fix: eliminación de días grises</span>
-                        <p style="margin-top:10px; font-size:14px; color:var(--text-dim);">Tu sonrisa aplicó un hotfix a todas mis tristezas.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="msg-card reveal" style="border-left-color: var(--accent-green); margin-bottom: 100px;">
-                <p style="text-align: center; font-weight: 700; color: #fff;">
-                    Gracias por existir. Gracias por ser tú, tan real, tan única, tan especial. Gracias por hacerme sentir este amor que me llena y me transforma.
+                <p style="font-family: var(--font-mono); color: var(--accent-cyan); font-size: 12px;">
+                    // Compiled with 100% devotion | Stabilizing emotions... OK
                 </p>
-            </div>
-        </main>
 
-        <footer>
-            <button class="deploy-button" onclick="deployCelebration()">
-                Finalize_Deployment.exe
-            </button>
-            <p style="margin-top: 40px; font-family: 'Fira Code'; font-size: 10px; color: #333;">
-                &copy; 2024 Love_OS // Created with extreme care for the most special person.
-            </p>
-        </footer>
-    </div>
+                <div class="bio-vault">
+                    <!-- FOTO PINGÜINO -->
+                    <div class="vault-card" style="--theme-color: #00f2ff; --theme-glow: rgba(0,242,255,0.4);">
+                        <div class="scan-laser"></div>
+                        <img src="pinguino.jpg" alt="Pinguino" class="vault-img">
+                        <div class="vault-meta">
+                            <span class="c-green">[SCAN_COMPLETE]</span> Entity: Pinguino.sys <br>
+                            <span class="c-cyan">Attribute: Protector Eterno</span>
+                        </div>
+                    </div>
 
-    <!-- UI Elements -->
-    <div class="music-player">
-        <div class="music-thumb"><i class="fas fa-heart" style="color:#fff;"></i></div>
-        <div>
-            <div style="font-size:13px; font-weight:700;">Sintonía_Eterna.mp3</div>
-            <div style="font-size:11px; color:var(--accent-cyan);">Playing: Tu voz en mi mente</div>
+                    <!-- FOTO TORTUGA -->
+                    <div class="vault-card" style="--theme-color: #39ff14; --theme-glow: rgba(57,255,20,0.4);">
+                        <div class="scan-laser"></div>
+                        <img src="tortuga.avif" alt="Tortuga" class="vault-img">
+                        <div class="vault-meta">
+                            <span class="c-green">[SCAN_COMPLETE]</span> Entity: Tortuga.sys <br>
+                            <span class="c-green">Attribute: Calma Infinita</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard de Salud Emocional -->
+            <section class="dashboard">
+                <div class="dash-card reveal">
+                    <h3>System_Status</h3>
+                    <div class="stat-flex">
+                        <span class="stat-label">Connection Latency</span>
+                        <span class="stat-value">0.00ms</span>
+                    </div>
+                    <div class="stat-flex">
+                        <span class="stat-label">Heart_Stability</span>
+                        <span class="stat-value">Perfect</span>
+                    </div>
+                    <div class="visualizer">
+                        <div class="vis-bar" style="animation-delay: 0.1s"></div>
+                        <div class="vis-bar" style="animation-delay: 0.3s"></div>
+                        <div class="vis-bar" style="animation-delay: 0.5s"></div>
+                        <div class="vis-bar" style="animation-delay: 0.2s"></div>
+                        <div class="vis-bar" style="animation-delay: 0.4s"></div>
+                        <div class="vis-bar" style="animation-delay: 0.6s"></div>
+                    </div>
+                </div>
+
+                <div class="dash-card reveal">
+                    <h3>Emotions_Barometer</h3>
+                    <div class="stat-flex">
+                        <span class="stat-label">Happiness_Level</span>
+                        <span class="stat-value">100%</span>
+                    </div>
+                    <div class="health-bar-container"><div class="health-bar-fill" style="width: 100%"></div></div>
+                    <div style="margin-top: 15px;" class="stat-flex">
+                        <span class="stat-label">Obsession_Level</span>
+                        <span class="stat-value">Overload</span>
+                    </div>
+                    <div class="health-bar-container"><div class="health-bar-fill" style="width: 100%; background: var(--accent-pink)"></div></div>
+                </div>
+
+                <div class="dash-card reveal">
+                    <h3>Resource_Usage</h3>
+                    <div class="stat-flex"><span class="stat-label">Thoughts_RAM</span><span class="stat-value">99% YOU</span></div>
+                    <div class="stat-flex"><span class="stat-label">Memory_Storage</span><span class="stat-value">Full of Smiles</span></div>
+                    <div class="stat-flex"><span class="stat-label">Processor</span><span class="stat-value">Heart-Core i9</span></div>
+                </div>
+            </section>
+
+            <!-- Sección de Documentación del Corazón -->
+            <section class="docs-section reveal">
+                <div class="docs-header">
+                    <span class="method-tag">STABLE</span>
+                    <span style="font-family: var(--font-mono); font-size: 14px; color: var(--accent-cyan);">API_Endpoint: /heart/v6/feelings/infinite</span>
+                </div>
+                
+                <p class="doc-paragraph">
+                    Hoy, 14 de febrero, he decidido abrir el código fuente de lo que siento. No es un simple mensaje, es una compilación de cada latido, cada risa compartida y cada momento en el que simplemente existimos juntos. He configurado mi sistema para que tú seas el usuario root con privilegios totales.
+                </p>
+
+                <p class="doc-paragraph">
+                    Lo que siento por ti no tiene bugs, no tiene fugas de memoria y ciertamente no tiene fin. Te amo no por lo que eres, sino por la paz que inyectas en mi procesador central cada vez que me miras o me hablas. Eres el framework que sostiene mi vida.
+                </p>
+
+                <div style="background: rgba(0,0,0,0.5); padding: 25px; border-radius: 12px; font-family: var(--font-mono); font-size: 13px; color: var(--accent-green); border-left: 3px solid var(--accent-green);">
+                    // sudo apt-get install felicidad_eterna <br>
+                    // Leyendo repositorio del alma... <br>
+                    // Instalando "Tu_Sonrisa_v2.0"... [####################] 100% <br>
+                    // Éxito: Eres el motivo de mi existencia.
+                </div>
+            </section>
+
+            <h2 class="spotlight-text reveal">Te amo con todo mi sistema.</h2>
+
+            <!-- Timeline de Commits -->
+            <section class="commit-log">
+                <div class="commit-item reveal">
+                    <div class="commit-card">
+                        <div class="title">feat: First_Connection.sys</div>
+                        <div class="desc">Inicialización del repositorio del corazón. El día que mi mundo cambió de base de datos.</div>
+                    </div>
+                </div>
+                <div class="commit-item reveal">
+                    <div class="commit-card">
+                        <div class="title">update: Memory_Upgrade_Patch</div>
+                        <div class="desc">Añadidos miles de recuerdos en alta definición. Optimizando cada risa guardada.</div>
+                    </div>
+                </div>
+                <div class="commit-item reveal">
+                    <div class="commit-card" style="border-color: var(--accent-pink);">
+                        <div class="title" style="color: var(--accent-pink);">fix: Grey_Days_Elimination</div>
+                        <div class="desc">Tu presencia ha parchado permanentemente cualquier rastro de tristeza en el servidor.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Carta Final -->
+            <section class="docs-section reveal" style="border: 2px solid var(--accent-pink); background: rgba(255, 45, 85, 0.02);">
+                <p class="doc-paragraph" style="text-align: center; font-weight: 700; color: #fff;">
+                    Gracias por ser mi lugar favorito. Gracias por ser esa constante en un universo lleno de variables. Gracias por simplemente ser tú, porque para mi sistema operativo, tú eres la única actualización que necesito para siempre.
+                </p>
+                <div style="text-align: center; font-family: var(--font-mono); color: var(--accent-pink); margin-top: 20px;">
+                    &lt;commit message="Mi vida entera para ti" /&gt;
+                </div>
+            </section>
+
+            <footer>
+                <button class="mega-button" onclick="celebrate()">DEPLOY_ETERNAL_LOVE.EXE</button>
+                <p style="margin-top: 50px; font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); opacity: 0.5;">
+                    -- HEART OS KERNEL v6.0.4-LTS | ENCRYPTED WITH PURE LOVE --
+                </p>
+            </footer>
+
         </div>
     </div>
 
+    <!-- Floating Audio UI -->
+    <div class="player-floating">
+        <div class="album-art"><i class="fas fa-heart"></i></div>
+        <div style="flex: 1;">
+            <div style="font-size: 13px; font-weight: 800; color: #fff;">Sintonía_Eterna.mp3</div>
+            <div style="font-size: 10px; color: var(--accent-cyan); font-family: var(--font-mono);">00:00 / ∞</div>
+        </div>
+        <i class="fas fa-play" style="color: var(--accent-cyan); cursor: pointer;"></i>
+    </div>
+
     <script>
-        // --- Secuencia de Booteo Pro ---
-        const bootLines = [
-            {t: "> Kernel inicializado...", c: "white"},
-            {t: "> Cargando módulos de afecto...", c: "cyan"},
-            {t: "> Bypass Security: Gray_Days... OK", c: "green"},
-            {t: "> Localizando unidad: PINGUINO...", c: "cyan"},
-            {t: "> Localizando unidad: TORTUGA...", c: "green"},
-            {t: "> Sincronizando latidos...", c: "pink"},
-            {t: "> Error 404: Tristeza no encontrada.", c: "pink"},
-            {t: "> Optimizando sentimientos al 1000%...", c: "white"},
-            {t: "> Conexión establecida con éxito.", c: "green"},
-            {t: "> Abriendo interfaz de amor...", c: "cyan"}
+        // --- Secuencia de Booteo Pro (+100 líneas de lógica) ---
+        const bootMessages = [
+            {t: "> Kernel Heart_OS v6.0.4 loading...", c: ""},
+            {t: "> Checking system integrity...", c: ""},
+            {t: "> CPU: Love-Core i9 detected at 5.0GHz", c: "c-cyan"},
+            {t: "> RAM: 1.0 Petabyte of memories detected", c: "c-cyan"},
+            {t: "> Loading module: Afecto_Incondicional.ko", c: "c-green"},
+            {t: "> Loading module: Paciencia_Infinitum.ko", c: "c-green"},
+            {t: "> Searching for entity: ELLA...", c: "c-purple"},
+            {t: "> [FOUND] Entity located in Heart_Sector_01", c: "c-green"},
+            {t: "> Bypassing firewall: Tristeza_v2.1... [PASSED]", c: "c-pink"},
+            {t: "> Establishing secure tunnel (Heart2Heart)...", c: "c-cyan"},
+            {t: "> Protocol: Valentine_Day_2024 activated.", c: "c-pink"},
+            {t: "> Running diagnostic on Pinguino.sys...", c: "c-cyan"},
+            {t: "> Pinguino: 100% Protective Mode enabled.", c: "c-green"},
+            {t: "> Running diagnostic on Tortuga.sys...", c: "c-cyan"},
+            {t: "> Tortuga: 100% Calma Mode enabled.", c: "c-green"},
+            {t: "> Compiling sentiments...", c: ""},
+            {t: "> [SUCCESS] System is stable and fully in love.", c: "c-green"},
+            {t: "> Launching GUI...", c: "c-purple"}
         ];
 
         const bootScreen = document.getElementById('boot-screen');
         let bootIdx = 0;
 
         function runBoot() {
-            if (bootIdx < bootLines.length) {
-                let p = document.createElement('div');
-                p.className = `boot-line ${bootLines[bootIdx].c}`;
-                p.innerHTML = bootLines[bootIdx].t;
+            if (bootIdx < bootMessages.length) {
+                const p = document.createElement('div');
+                p.className = `boot-line ${bootMessages[bootIdx].c}`;
+                p.innerHTML = bootMessages[bootIdx].t;
                 bootScreen.appendChild(p);
                 gsap.to(p, {opacity: 1, duration: 0.1});
                 bootIdx++;
-                setTimeout(runBoot, 200);
+                setTimeout(runBoot, Math.random() * 150 + 50);
             } else {
                 setTimeout(() => {
                     gsap.to(bootScreen, {
-                        y: "-100%", duration: 1.5, ease: "expo.inOut",
+                        y: "-100%", duration: 1.2, ease: "expo.inOut",
                         onComplete: () => {
                             bootScreen.remove();
-                            document.getElementById('main-content').style.opacity = 1;
                             initMain();
                         }
                     });
-                }, 1000);
+                }, 800);
             }
         }
         runBoot();
 
         // --- Matrix Background ---
-        const canvas = document.getElementById('matrix-canvas');
+        const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-
-        const letters = "0101❤️{}< />;LOVE";
+        const alphabet = "010101❤️{}< />;LOVEPINGUINOTORTUGA";
         const fontSize = 14;
         const columns = canvas.width / fontSize;
         const drops = Array(Math.floor(columns)).fill(1);
 
         function drawMatrix() {
-            ctx.fillStyle = "rgba(2, 4, 8, 0.05)";
+            ctx.fillStyle = "rgba(1, 2, 4, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.font = fontSize + "px 'Fira Code'";
+            ctx.font = fontSize + "px Fira Code";
             for (let i = 0; i < drops.length; i++) {
-                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
                 ctx.fillStyle = Math.random() > 0.95 ? "#ff2d55" : "#00f2ff";
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
                 if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
@@ -588,60 +680,75 @@
         }
         setInterval(drawMatrix, 50);
 
-        // --- Main Animations ---
+        // --- Custom Cursor Logic ---
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', e => {
+            cursor.style.display = 'block';
+            gsap.to(cursor, {x: e.clientX, y: e.clientY, duration: 0.1});
+        });
+
+        // --- GSAP & Scroll Logic ---
         function initMain() {
+            document.getElementById('main-content').style.opacity = 1;
+            document.getElementById('main-content').style.pointerEvents = "all";
             gsap.registerPlugin(ScrollTrigger);
 
-            // Typing Terminal
-            const term = document.getElementById('hero-terminal');
-            const termText = "> status: Online\n> connection: Stable\n> encryption: Heart2Heart_v5\n> ping: 0ms (Contigo no hay distancia)\n> current_thought: Te extraño...";
-            let i = 0;
-            function type() {
-                if (i < termText.length) {
-                    term.innerHTML += termText.charAt(i).replace('\n', '<br>');
-                    i++;
-                    setTimeout(type, 30);
-                }
-            }
-            type();
+            // Scroll Progress
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                document.getElementById("scroll-progress").style.width = scrolled + "%";
+            });
 
-            // Scroll Reveals
-            document.querySelectorAll('.reveal').forEach(el => {
+            // Reveal Animations
+            gsap.utils.toArray('.reveal').forEach(el => {
                 gsap.from(el, {
                     scrollTrigger: {
                         trigger: el,
-                        start: "top 90%",
+                        start: "top 85%",
                     },
-                    y: 50,
-                    opacity: 0,
-                    duration: 1,
-                    ease: "power3.out"
+                    y: 60, opacity: 0, duration: 1, ease: "power3.out"
                 });
+            });
+
+            // Spotlight Text Animation
+            gsap.to('.spotlight-text', {
+                scrollTrigger: {
+                    trigger: '.spotlight-text',
+                    start: "top 80%",
+                    toggleActions: "play none none reverse"
+                },
+                opacity: 1, scale: 1, duration: 1.5, ease: "elastic.out(1, 0.5)"
+            });
+
+            // Bars Animation
+            gsap.to('.health-bar-fill', {
+                scrollTrigger: { trigger: '.dashboard' },
+                width: "100%", duration: 3, stagger: 0.3
             });
         }
 
-        // --- Celebration ---
-        function deployCelebration() {
-            const count = 200;
-            const defaults = { origin: { y: 0.7 } };
+        // --- Celebration Mega Protocol ---
+        function celebrate() {
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-            function fire(particleRatio, opts) {
-                confetti({
-                    ...defaults,
-                    ...opts,
-                    particleCount: Math.floor(count * particleRatio)
-                });
-            }
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
 
-            fire(0.25, { spread: 26, startVelocity: 55 });
-            fire(0.2, { spread: 60 });
-            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-            fire(0.1, { spread: 120, startVelocity: 45 });
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                const particleCount = 50 * (timeLeft / duration);
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+            }, 250);
 
             setTimeout(() => {
-                alert("Has ejecutado 'amor_eterno.exe' con éxito.\nMi sistema operativo te pertenece para siempre. ❤️");
-            }, 700);
+                alert("EJECUCIÓN COMPLETADA:\nHas instalado 'Amor_Infinito_Build_2024' en mi corazón.\nTe amo para siempre.");
+            }, 800);
         }
     </script>
 </body>
