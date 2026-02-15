@@ -2,378 +2,646 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heart_System_Overdrive_v4</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500&family=Inter:wght@300;400;700;900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Heart_Core_Final_Stable_v5.0.exe</title>
     
+    <!-- Librerías Externas -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&family=Plus+Jakarta+Sans:wght@200;400;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
     <style>
         :root {
-            --bg: #030508;
-            --cyan: #00f2ff;
-            --pink: #ff2d55;
-            --green: #39ff14;
-            --glass: rgba(15, 20, 30, 0.8);
-            --border: rgba(255, 255, 255, 0.1);
+            --bg: #020408;
+            --accent-cyan: #00f2ff;
+            --accent-pink: #ff2d55;
+            --accent-green: #39ff14;
+            --glass: rgba(10, 15, 25, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* --- Reset & Base --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
+        
         body {
             background-color: var(--bg);
-            color: #e2e8f0;
-            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 45, 85, 0.05) 0%, transparent 50%);
+            scroll-behavior: smooth;
         }
 
-        /* --- Fondo Animado --- */
-        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.3; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 10px; }
 
-        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
-
-        /* --- Header y Badge --- */
-        header { text-align: center; margin-bottom: 80px; padding-top: 50px; }
-        
-        .sys-badge {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 50px;
-            background: rgba(0, 242, 255, 0.1);
-            border: 1px solid var(--cyan);
-            color: var(--cyan);
+        /* --- Custom Loader (The Boot Sequence) --- */
+        #boot-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 99999;
+            padding: 40px;
             font-family: 'Fira Code', monospace;
-            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .boot-line { font-size: 13px; line-height: 1.5; margin-bottom: 4px; opacity: 0; }
+        .cyan { color: var(--accent-cyan); }
+        .pink { color: var(--accent-pink); }
+        .green { color: var(--accent-green); }
+
+        /* --- Background Effects --- */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0; z-index: -1;
+            opacity: 0.25;
+            filter: blur(1px);
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- Layout --- */
+        .wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .version-badge {
+            font-family: 'Fira Code';
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0,242,255,0.2);
         }
 
         .main-title {
-            font-size: clamp(3rem, 10vw, 5.5rem);
-            font-weight: 900;
+            font-size: clamp(3rem, 12vw, 6.5rem);
+            font-weight: 800;
+            letter-spacing: -4px;
             line-height: 0.9;
-            background: linear-gradient(180deg, #fff 0%, #64748b 100%);
+            margin-bottom: 20px;
+            background: linear-gradient(180deg, #fff 0%, var(--accent-pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
         }
 
-        /* --- PERSONAJES ULTRA REALISTAS --- */
-        .display-unit {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 60px 20px;
-            backdrop-filter: blur(20px);
+        /* --- Characters Showcase (The Real Images) --- */
+        .character-vault {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 50px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            gap: 40px;
+            margin: 60px 0;
+            width: 100%;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .char-card {
+            width: 280px;
+            height: 380px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
             position: relative;
             overflow: hidden;
+            transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            backdrop-filter: blur(10px);
         }
 
-        .display-unit::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03), transparent);
-            pointer-events: none;
+        .char-card:hover {
+            transform: translateY(-10px) rotateY(10deg);
+            border-color: var(--card-color);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px var(--card-glow);
         }
 
-        .characters-grid {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 60px;
-            width: 100%;
-        }
-
-        .char-box {
-            position: relative;
-            width: 220px;
-            height: 220px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        .char-box:hover { transform: scale(1.1) translateY(-10px); }
-
-        .svg-render {
+        .char-img {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(0 0 30px var(--glow));
+            object-fit: cover;
+            opacity: 0.8;
+            transition: 0.5s;
+            filter: grayscale(0.5);
         }
 
-        /* --- Terminal Mejorada --- */
-        .console {
-            width: 100%;
-            max-width: 500px;
-            background: #000;
-            border-radius: 15px;
-            border: 1px solid #334155;
-            overflow: hidden;
-            font-family: 'Fira Code', monospace;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        .char-card:hover .char-img {
+            opacity: 1;
+            filter: grayscale(0);
+            transform: scale(1.1);
         }
 
-        .console-header {
-            background: #1e293b;
-            padding: 12px 20px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .dot { width: 10px; height: 10px; border-radius: 50%; }
-
-        .console-body {
-            padding: 25px;
-            font-size: 14px;
-            color: var(--green);
-            line-height: 1.8;
-        }
-
-        /* --- Contenido de Mensajes --- */
-        .message-section { margin-top: 100px; }
-
-        .card {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            padding: 50px;
-            border-radius: 35px;
-            margin-bottom: 40px;
-            transition: 0.8s;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        .card.visible { opacity: 1; transform: translateY(0); }
-
-        .card p {
-            font-size: 1.2rem;
-            line-height: 1.9;
-            color: #94a3b8;
-            margin-bottom: 30px;
-            font-weight: 300;
-        }
-
-        .highlight-text {
-            font-family: 'Dancing Script', cursive;
-            font-size: 5.5rem;
-            text-align: center;
-            display: block;
-            margin: 60px 0;
-            background: linear-gradient(45deg, var(--pink), #ff8fa3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(255,45,85,0.4));
-        }
-
-        .code-block {
-            background: rgba(0,0,0,0.4);
-            padding: 20px;
-            border-left: 4px solid var(--cyan);
-            color: var(--cyan);
+        .char-label {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 8px;
             font-family: 'Fira Code';
-            font-size: 0.9rem;
-            border-radius: 0 10px 10px 0;
-            margin: 30px 0;
+            font-size: 12px;
+            border-left: 3px solid var(--card-color);
         }
+
+        .scan-line {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--card-color);
+            box-shadow: 0 0 10px var(--card-color);
+            animation: scan 3s infinite linear;
+            z-index: 5;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* --- Terminal Unit --- */
+        .terminal-unit {
+            background: #000;
+            border-radius: 12px;
+            border: 1px solid #222;
+            padding: 20px;
+            margin-top: 40px;
+            width: 100%;
+            max-width: 600px;
+            font-family: 'Fira Code';
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- Love API Documentation --- */
+        .api-section {
+            margin: 100px 0;
+            padding: 40px;
+            background: var(--glass);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .api-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .api-method {
+            background: var(--accent-green);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .api-endpoint {
+            font-family: 'Fira Code';
+            color: var(--accent-cyan);
+        }
+
+        /* --- Message Cards --- */
+        .message-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin: 80px 0;
+        }
+
+        .msg-card {
+            padding: 40px;
+            background: rgba(255,255,255,0.02);
+            border-left: 2px solid var(--accent-pink);
+            border-radius: 0 20px 20px 0;
+            position: relative;
+            transition: 0.4s;
+        }
+
+        .msg-card:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateX(10px);
+        }
+
+        .msg-card p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .code-piropo {
+            font-family: 'Fira Code';
+            font-size: 14px;
+            color: var(--accent-cyan);
+            opacity: 0.6;
+        }
+
+        .dancing-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 6rem;
+            text-align: center;
+            margin: 100px 0;
+            color: var(--accent-pink);
+            text-shadow: 0 0 30px rgba(255, 45, 85, 0.4);
+        }
+
+        /* --- Git Commit History --- */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 100px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 1px;
+            background: #222;
+        }
+
+        .commit-item {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .commit-dot {
+            position: absolute;
+            left: -44px;
+            top: 5px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .commit-content {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+        }
+
+        /* --- Music Player UI --- */
+        .music-player {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 300px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .music-thumb {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-pink);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0% { scale: 1; } 50% { scale: 1.1; } 100% { scale: 1; } }
 
         /* --- Footer --- */
-        footer { padding: 100px 0; text-align: center; }
+        footer {
+            padding: 100px 0;
+            text-align: center;
+            border-top: 1px solid #111;
+        }
 
-        .btn-deploy {
+        .deploy-button {
             background: transparent;
-            border: 2px solid var(--cyan);
-            color: var(--cyan);
-            padding: 22px 60px;
-            border-radius: 100px;
+            border: 2px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 20px 45px;
+            border-radius: 12px;
             font-family: 'Fira Code';
             font-weight: 700;
-            cursor: pointer;
-            transition: 0.4s;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
+            transition: 0.4s;
+            overflow: hidden;
+            position: relative;
         }
 
-        .btn-deploy:hover {
-            background: var(--cyan);
+        .deploy-button:hover {
+            background: var(--accent-cyan);
             color: #000;
-            box-shadow: 0 0 50px var(--cyan);
-            transform: translateY(-5px);
+            box-shadow: 0 0 40px var(--accent-cyan);
         }
 
+        /* --- Mobile --- */
         @media (max-width: 768px) {
-            .characters-grid { flex-direction: column; }
-            .main-title { font-size: 3.5rem; }
-            .highlight-text { font-size: 3.5rem; }
+            .character-vault { flex-direction: column; align-items: center; }
+            .main-title { font-size: 3rem; }
+            .dancing-title { font-size: 4rem; }
+            .music-player { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <canvas id="canvas-bg"></canvas>
+    <!-- Escena de Booteo -->
+    <div id="boot-screen"></div>
 
-    <div class="container">
-        <header>
-            <div class="sys-badge">system_status: 100%_connected</div>
-            <h1 class="main-title">Heart_Repository</h1>
-            <p style="color: #64748b; font-family: 'Fira Code';">Compiled on Feb 14, 2024</p>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="vignette"></div>
+
+    <div class="wrapper" id="main-content" style="opacity: 0;">
+        
+        <!-- Header -->
+        <header class="hero">
+            <div class="version-badge">system state: infinite_love.stable</div>
+            <h1 class="main-title">Mi_Lugar_Favorito<br>.sys</h1>
+            <p style="color: var(--text-dim); font-family: 'Fira Code'; font-size: 0.9rem;">
+                Compiled with maximum devotion for you
+            </p>
+
+            <div class="character-vault">
+                <!-- Pingüino -->
+                <div class="char-card" style="--card-color: #00f2ff; --card-glow: rgba(0,242,255,0.3)">
+                    <div class="scan-line"></div>
+                    <!-- REEMPLAZA ESTA URL CON TU FOTO DEL PINGÜINO -->
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0t_G1jK-iG2Nq0G_5-0U_p6uR5D2Z-I_Vzg&s" alt="Pinguino" class="char-img">
+                    <div class="char-label">
+                        <span class="green">[BIO_AUTH]</span> Pinguino.unit <br>
+                        <span class="cyan">Status: Protegiéndote</span>
+                    </div>
+                </div>
+
+                <!-- Tortuga -->
+                <div class="char-card" style="--card-color: #39ff14; --card-glow: rgba(57,255,20,0.3)">
+                    <div class="scan-line"></div>
+                    <!-- REEMPLAZA ESTA URL CON TU FOTO DE LA TORTUGA -->
+                    <img src="https://static.nationalgeographic.es/files/styles/image_3200/public/01-sea-turtles.jpg?w=1900&h=1267" alt="Tortuga" class="char-img">
+                    <div class="char-label">
+                        <span class="green">[BIO_AUTH]</span> Tortuga.unit <br>
+                        <span class="green">Status: Nadando a tu lado</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terminal-unit">
+                <div style="display:flex; gap:8px; margin-bottom:15px;">
+                    <div style="width:10px; height:10px; border-radius:50%; background:#ff5f56"></div>
+                    <div style="width:10px; height:10px; border-radius:50%; background:#ffbd2e"></div>
+                    <div style="width:10px; height:10px; border-radius:50%; background:#27c93f"></div>
+                </div>
+                <div id="hero-terminal" style="color:var(--accent-green); font-size: 14px; text-align: left;"></div>
+            </div>
         </header>
 
-        <div class="display-unit">
-            <div class="characters-grid">
-                <!-- PINGÜINO REALISTA -->
-                <div class="char-box" style="--glow: rgba(0, 242, 255, 0.4)">
-                    <svg class="svg-render" viewBox="0 0 200 240">
-                        <defs>
-                            <linearGradient id="pBody" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#2c3e50" />
-                                <stop offset="100%" style="stop-color:#000000" />
-                            </linearGradient>
-                            <radialGradient id="pBelly" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" style="stop-color:#ffffff" />
-                                <stop offset="100%" style="stop-color:#d1d5db" />
-                            </radialGradient>
-                        </defs>
-                        <!-- Sombras -->
-                        <ellipse cx="100" cy="220" rx="60" ry="10" fill="black" opacity="0.3" />
-                        <!-- Alas (con profundidad) -->
-                        <path d="M40 120 Q 10 140 30 180" stroke="var(--cyan)" stroke-width="6" fill="none" stroke-linecap="round" />
-                        <path d="M160 120 Q 190 140 170 180" stroke="var(--cyan)" stroke-width="6" fill="none" stroke-linecap="round" />
-                        <!-- Cuerpo Realista -->
-                        <path d="M100 20 C 50 20 30 60 30 120 C 30 200 60 220 100 220 C 140 220 170 200 170 120 C 170 60 150 20 100 20" fill="url(#pBody)" stroke="var(--cyan)" stroke-width="2"/>
-                        <!-- Panza con gradiente -->
-                        <path d="M100 70 C 70 70 55 100 55 145 C 55 190 75 210 100 210 C 125 210 145 190 145 145 C 145 100 130 70 100 70" fill="url(#pBelly)"/>
-                        <!-- Ojos con reflejo -->
-                        <circle cx="75" cy="80" r="7" fill="#000" />
-                        <circle cx="77" cy="77" r="2.5" fill="#fff" />
-                        <circle cx="125" cy="80" r="7" fill="#000" />
-                        <circle cx="127" cy="77" r="2.5" fill="#fff" />
-                        <!-- Pico 3D -->
-                        <path d="M85 105 L115 105 L100 130 Z" fill="#f59e0b"/>
-                        <path d="M85 105 Q 100 100 115 105" fill="none" stroke="#b45309" stroke-width="1"/>
-                    </svg>
+        <main>
+            <!-- Sección de Mensajes -->
+            <section class="message-grid">
+                <div class="msg-card reveal">
+                    <div class="code-piropo">// sudo apt-get install felicidad_eterna</div>
+                    <p>Hoy, 14 de febrero, no quiero escribirte un simple mensaje… quiero escribirte una promesa envuelta en palabras, un abrazo convertido en letras, un pedacito de mi alma entregado en cada línea.</p>
                 </div>
 
-                <div style="font-family: 'Fira Code'; font-size: 40px; color: var(--pink); text-shadow: 0 0 20px var(--pink);">&lt;/&gt;</div>
+                <div class="dancing-title reveal">Te amo.</div>
 
-                <!-- TORTUGA REALISTA -->
-                <div class="char-box" style="--glow: rgba(57, 255, 20, 0.4)">
-                    <svg class="svg-render" viewBox="0 0 240 200">
-                        <defs>
-                            <linearGradient id="tShell" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" style="stop-color:#1e293b" />
-                                <stop offset="100%" style="stop-color:#020617" />
-                            </linearGradient>
-                        </defs>
-                        <!-- Sombras -->
-                        <ellipse cx="120" cy="170" rx="90" ry="12" fill="black" opacity="0.3" />
-                        <!-- Patas con textura -->
-                        <path d="M50 140 Q 30 160 50 170" stroke="var(--green)" stroke-width="12" fill="none" stroke-linecap="round"/>
-                        <path d="M190 140 Q 210 160 190 170" stroke="var(--green)" stroke-width="12" fill="none" stroke-linecap="round"/>
-                        <!-- Cabeza detallada -->
-                        <path d="M190 80 C 230 80 235 50 220 35 C 200 20 180 40 180 65" fill="var(--green)" stroke="#000" stroke-width="0.5"/>
-                        <circle cx="210" cy="50" r="3.5" fill="#000" />
-                        <!-- Caparazón (Domed 3D) -->
-                        <path d="M20 140 C 20 20 220 20 220 140 L 20 140" fill="url(#tShell)" stroke="var(--green)" stroke-width="3"/>
-                        <!-- Patrón de celdas tecnológicas -->
-                        <path d="M60 60 L90 50 L120 60 L120 90 L90 100 L60 90 Z" fill="none" stroke="var(--green)" stroke-width="1" opacity="0.4"/>
-                        <path d="M130 50 L160 40 L190 50 L190 80 L160 90 L130 80 Z" fill="none" stroke="var(--green)" stroke-width="1" opacity="0.4"/>
-                        <path d="M100 105 L130 95 L160 105 L160 130 L130 140 L100 130 Z" fill="none" stroke="var(--green)" stroke-width="1" opacity="0.4"/>
-                    </svg>
+                <div class="msg-card reveal">
+                    <div class="code-piropo">while(true) { queriéndote++; }</div>
+                    <p>Y cuando lo digo, no lo digo como una frase bonita que se pierde en el aire. Lo digo como algo que nace profundo, que crece cada día, que late fuerte cuando pienso en ti. Te amo con la certeza de quien ha encontrado algo valioso.</p>
+                </div>
+
+                <div class="msg-card reveal">
+                    <div class="code-piropo">git commit -m "Mi corazón para siempre"</div>
+                    <p>Desde que llegaste a mi vida, todo tiene un brillo diferente. No hiciste magia… fuiste tú. Tu forma tan única de ser, tu esencia tan auténtica. Me enamoré de tu corazón, de tu mente, de tu luz.</p>
+                </div>
+            </section>
+
+            <!-- Sección Love API -->
+            <section class="api-section reveal">
+                <div class="api-header">
+                    <div class="api-method">GET</div>
+                    <div class="api-endpoint">/v1/heart/status</div>
+                </div>
+                <div style="font-family:'Fira Code'; font-size:14px; color:var(--text-dim); line-height:2;">
+                    { <br>
+                    &nbsp;&nbsp;"owner": "Tú", <br>
+                    &nbsp;&nbsp;"love_level": "Infinity", <br>
+                    &nbsp;&nbsp;"mood": "Extremadamente enamorado", <br>
+                    &nbsp;&nbsp;"future_plans": ["Reír contigo", "Cumplir sueños", "Cuidarnos"], <br>
+                    &nbsp;&nbsp;"is_happy": true <br>
+                    }
+                </div>
+            </section>
+
+            <!-- Historial de Commits -->
+            <h3 style="font-family:'Fira Code'; color:var(--accent-cyan); margin-bottom:30px;">[ RELATIONSHIP_CHANGELOG ]</h3>
+            <div class="timeline">
+                <div class="commit-item reveal">
+                    <div class="commit-dot"></div>
+                    <div class="commit-content">
+                        <span style="color:var(--accent-pink); font-size:12px;">feat: inicialización del sistema</span>
+                        <p style="margin-top:10px; font-size:14px; color:var(--text-dim);">El día que te conocí y mi mundo cambió de base de datos.</p>
+                    </div>
+                </div>
+                <div class="commit-item reveal">
+                    <div class="commit-dot"></div>
+                    <div class="commit-content">
+                        <span style="color:var(--accent-cyan); font-size:12px;">update: parches de risas infinitas</span>
+                        <p style="margin-top:10px; font-size:14px; color:var(--text-dim);">Actualización constante de momentos hermosos a tu lado.</p>
+                    </div>
+                </div>
+                <div class="commit-item reveal">
+                    <div class="commit-dot"></div>
+                    <div class="commit-content">
+                        <span style="color:var(--accent-green); font-size:12px;">fix: eliminación de días grises</span>
+                        <p style="margin-top:10px; font-size:14px; color:var(--text-dim);">Tu sonrisa aplicó un hotfix a todas mis tristezas.</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="console">
-                <div class="console-header">
-                    <div class="dot" style="background: #ff5f56"></div>
-                    <div class="dot" style="background: #ffbd2e"></div>
-                    <div class="dot" style="background: #27c93f"></div>
-                </div>
-                <div class="console-body" id="type-text">
-                    <!-- El texto aparecerá aquí -->
-                </div>
-            </div>
-        </div>
-
-        <main class="message-section">
-            <div class="card">
-                <p>Hoy, 14 de febrero, no quiero escribirte un simple mensaje… quiero escribirte una promesa envuelta en palabras, un abrazo convertido en letras, un pedacito de mi alma entregado en cada línea.</p>
-                <div class="code-block">// sudo apt-get install felicidad_eterna</div>
-            </div>
-
-            <span class="highlight-text">Te amo.</span>
-
-            <div class="card">
-                <p>Y cuando lo digo, no lo digo como una frase bonita que se pierde en el aire. Lo digo como algo que nace profundo, que crece cada día, que late fuerte cuando pienso en ti. Te amo con la certeza de quien ha encontrado algo valioso, algo que no quiere perder jamás.</p>
-                <div class="code-block">while(true) { queriéndote++; }</div>
-                <p>Desde que llegaste a mi vida, todo tiene un brillo diferente. No hiciste magia… fuiste tú. Tu forma tan única de ser, tu esencia tan auténtica. Me enamoré de tu corazón, de tu mente, de tu luz.</p>
-            </div>
-
-            <div class="card" style="border: 2px solid var(--cyan)">
-                <p style="text-align: center; color: #fff; font-weight: 700;">"Gracias por existir. Gracias por ser tú, tan real, tan única. Eres mi lugar favorito, mi calma y mi inspiración."</p>
-                <div class="code-block" style="text-align: center;">git commit -m "Mi corazón para siempre"</div>
+            <div class="msg-card reveal" style="border-left-color: var(--accent-green); margin-bottom: 100px;">
+                <p style="text-align: center; font-weight: 700; color: #fff;">
+                    Gracias por existir. Gracias por ser tú, tan real, tan única, tan especial. Gracias por hacerme sentir este amor que me llena y me transforma.
+                </p>
             </div>
         </main>
 
         <footer>
-            <button class="btn-deploy" onclick="finish()">Finalize_Deployment.exe</button>
+            <button class="deploy-button" onclick="deployCelebration()">
+                Finalize_Deployment.exe
+            </button>
+            <p style="margin-top: 40px; font-family: 'Fira Code'; font-size: 10px; color: #333;">
+                &copy; 2024 Love_OS // Created with extreme care for the most special person.
+            </p>
         </footer>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <!-- UI Elements -->
+    <div class="music-player">
+        <div class="music-thumb"><i class="fas fa-heart" style="color:#fff;"></i></div>
+        <div>
+            <div style="font-size:13px; font-weight:700;">Sintonía_Eterna.mp3</div>
+            <div style="font-size:11px; color:var(--accent-cyan);">Playing: Tu voz en mi mente</div>
+        </div>
+    </div>
+
     <script>
-        // --- Animación de Terminal ---
-        const text = "> status: Online\n> connection: Stable\n> encryption: Heart2Heart_v4\n> ping: 0ms (Contigo no hay distancia)";
-        let i = 0;
-        function typeWriter() {
-            if (i < text.length) {
-                document.getElementById("type-text").innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
-                i++;
-                setTimeout(typeWriter, 40);
+        // --- Secuencia de Booteo Pro ---
+        const bootLines = [
+            {t: "> Kernel inicializado...", c: "white"},
+            {t: "> Cargando módulos de afecto...", c: "cyan"},
+            {t: "> Bypass Security: Gray_Days... OK", c: "green"},
+            {t: "> Localizando unidad: PINGUINO...", c: "cyan"},
+            {t: "> Localizando unidad: TORTUGA...", c: "green"},
+            {t: "> Sincronizando latidos...", c: "pink"},
+            {t: "> Error 404: Tristeza no encontrada.", c: "pink"},
+            {t: "> Optimizando sentimientos al 1000%...", c: "white"},
+            {t: "> Conexión establecida con éxito.", c: "green"},
+            {t: "> Abriendo interfaz de amor...", c: "cyan"}
+        ];
+
+        const bootScreen = document.getElementById('boot-screen');
+        let bootIdx = 0;
+
+        function runBoot() {
+            if (bootIdx < bootLines.length) {
+                let p = document.createElement('div');
+                p.className = `boot-line ${bootLines[bootIdx].c}`;
+                p.innerHTML = bootLines[bootIdx].t;
+                bootScreen.appendChild(p);
+                gsap.to(p, {opacity: 1, duration: 0.1});
+                bootIdx++;
+                setTimeout(runBoot, 200);
+            } else {
+                setTimeout(() => {
+                    gsap.to(bootScreen, {
+                        y: "-100%", duration: 1.5, ease: "expo.inOut",
+                        onComplete: () => {
+                            bootScreen.remove();
+                            document.getElementById('main-content').style.opacity = 1;
+                            initMain();
+                        }
+                    });
+                }, 1000);
             }
         }
-        typeWriter();
+        runBoot();
 
-        // --- Fondo de Estrellas Digitales ---
-        const canvas = document.getElementById('canvas-bg');
+        // --- Matrix Background ---
+        const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const stars = [];
-        for(let j=0; j<100; j++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2});
+        const letters = "0101❤️{}< />;LOVE";
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
 
-        function animateStars() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "#00f2ff";
-            stars.forEach(s => {
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-                ctx.fill();
-                s.y += 0.2;
-                if(s.y > canvas.height) s.y = 0;
-            });
-            requestAnimationFrame(animateStars);
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(2, 4, 8, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + "px 'Fira Code'";
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillStyle = Math.random() > 0.95 ? "#ff2d55" : "#00f2ff";
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
         }
-        animateStars();
+        setInterval(drawMatrix, 50);
 
-        // --- Scroll Reveal ---
-        window.addEventListener('scroll', () => {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                if(card.getBoundingClientRect().top < window.innerHeight - 100) card.classList.add('visible');
+        // --- Main Animations ---
+        function initMain() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Typing Terminal
+            const term = document.getElementById('hero-terminal');
+            const termText = "> status: Online\n> connection: Stable\n> encryption: Heart2Heart_v5\n> ping: 0ms (Contigo no hay distancia)\n> current_thought: Te extraño...";
+            let i = 0;
+            function type() {
+                if (i < termText.length) {
+                    term.innerHTML += termText.charAt(i).replace('\n', '<br>');
+                    i++;
+                    setTimeout(type, 30);
+                }
+            }
+            type();
+
+            // Scroll Reveals
+            document.querySelectorAll('.reveal').forEach(el => {
+                gsap.from(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 90%",
+                    },
+                    y: 50,
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power3.out"
+                });
             });
-        });
+        }
 
-        function finish() {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00f2ff', '#ff2d55', '#39ff14'] });
-            setTimeout(() => { alert("Has ejecutado 'amor_eterno.exe'. Mi sistema te pertenece. ❤️"); }, 500);
+        // --- Celebration ---
+        function deployCelebration() {
+            const count = 200;
+            const defaults = { origin: { y: 0.7 } };
+
+            function fire(particleRatio, opts) {
+                confetti({
+                    ...defaults,
+                    ...opts,
+                    particleCount: Math.floor(count * particleRatio)
+                });
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+
+            setTimeout(() => {
+                alert("Has ejecutado 'amor_eterno.exe' con éxito.\nMi sistema operativo te pertenece para siempre. ❤️");
+            }, 700);
         }
     </script>
 </body>
