@@ -3,487 +3,454 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para mi lugar favorito en el mundo</title>
-    <!-- Fuentes de Google -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Montserrat:wght@200;300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <title>Para Mi Persona Favorita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Montserrat:wght@100;300;400&family=Parisienne&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary-rose: #ff4d6d;
-            --dark-rose: #800f2f;
-            --soft-pink: #fff0f3;
-            --gold: #d4af37;
-            --glass: rgba(255, 255, 255, 0.85);
-            --text-color: #2b2d42;
+            --bg-color: #0a0a0c;
+            --accent-gold: #c5a47e;
+            --rose-gold: #e5b3a4;
+            --deep-rose: #5e3034;
+            --text-light: #f4f1ea;
+            --glass-bg: rgba(15, 15, 20, 0.8);
         }
 
-        /* --- Reset y General --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: #000;
-            font-family: 'Montserrat', sans-serif;
-            color: var(--text-color);
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            font-family: 'Cormorant Garamond', serif;
             overflow-x: hidden;
-            scroll-behavior: smooth;
+            cursor: none; /* Cursor personalizado */
         }
 
-        /* --- Custom Scrollbar --- */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--soft-pink); }
-        ::-webkit-scrollbar-thumb { background: var(--primary-rose); border-radius: 10px; }
-
-        /* --- Pantalla de Carga --- */
-        #loader {
+        /* --- Fondo de Estrellas y Nebulosa --- */
+        #canvas-nebula {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, #fff0f3 0%, #ffb3c1 100%);
+            z-index: -2;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0c 100%);
+        }
+
+        /* --- Cursor Custom --- */
+        #cursor-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-gold);
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s;
+        }
+
+        .sparkle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            animation: sparkleAnim 1s linear forwards;
+        }
+
+        @keyframes sparkleAnim {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0) translateY(50px); opacity: 0; }
+        }
+
+        /* --- Preloader --- */
+        #preloader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color);
+            z-index: 1000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
-            transition: opacity 1s ease;
         }
 
-        .loader-heart {
-            font-size: 50px;
-            color: var(--primary-rose);
-            animation: beat 1s infinite ease-in-out;
-        }
-
-        @keyframes beat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-        }
-
-        /* --- Fondo Animado (Canvas) --- */
-        #canvas-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            background: linear-gradient(to bottom, #fff0f3, #ffccd5);
+        .loader-text {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 5px;
+            color: var(--accent-gold);
+            animation: pulse 2s infinite;
         }
 
         /* --- Hero Section --- */
         .hero {
-            height: 100vh;
+            height: 120vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .hero h1 {
-            font-family: 'Great Vibes', cursive;
-            font-size: 5rem;
-            color: var(--dark-rose);
-            text-shadow: 3px 3px 10px rgba(0,0,0,0.1);
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 2s forwards 1s;
-        }
-
-        .hero p {
-            font-family: 'Dancing Script', cursive;
-            font-size: 1.8rem;
-            color: var(--primary-rose);
-            margin-top: 10px;
-            opacity: 0;
-            animation: fadeInUp 2s forwards 2s;
-        }
-
-        .scroll-down {
+        .floating-flower {
             position: absolute;
-            bottom: 30px;
-            animation: bounce 2s infinite;
-            color: var(--primary-rose);
-            font-size: 2rem;
+            width: 300px;
+            opacity: 0.15;
+            filter: sepia(1) hue-rotate(320deg);
+            pointer-events: none;
         }
 
-        /* --- Contenedor de la Carta --- */
-        .content-wrapper {
-            max-width: 900px;
+        .hero-title {
+            font-family: 'Parisienne', cursive;
+            font-size: clamp(3rem, 10vw, 7rem);
+            color: var(--rose-gold);
+            text-align: center;
+            z-index: 2;
+            transition: 0.5s;
+        }
+
+        .hero-subtitle {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 8px;
+            font-size: 1rem;
+            margin-top: 20px;
+            color: var(--accent-gold);
+            opacity: 0.7;
+        }
+
+        /* --- Letter Styling --- */
+        .main-container {
+            max-width: 1000px;
             margin: 0 auto;
             padding: 100px 20px;
             position: relative;
         }
 
-        .letter-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            padding: 60px;
-            border-radius: 50px 5px 50px 5px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
-            border: 2px solid rgba(255, 255, 255, 0.5);
+        .glass-sheet {
+            background: var(--glass-bg);
+            border: 1px solid rgba(197, 164, 126, 0.2);
+            padding: 80px 60px;
+            border-radius: 4px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
             position: relative;
-            overflow: hidden;
         }
 
-        /* Decoración de Esquinas */
-        .corner-decor {
+        .glass-sheet::before {
+            content: '';
             position: absolute;
-            width: 150px;
-            height: 150px;
-            opacity: 0.2;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 1px solid rgba(197, 164, 126, 0.1);
             pointer-events: none;
         }
-        .top-right { top: 0; right: 0; transform: rotate(90deg); }
-        .bottom-left { bottom: 0; left: 0; transform: rotate(270deg); }
 
-        /* --- Estilos de Texto --- */
-        .letter-paragraph {
-            margin-bottom: 30px;
-            line-height: 1.8;
-            font-size: 1.25rem;
-            color: #333;
-            text-align: justify;
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Playfair Display', serif;
+        .drop-cap {
+            float: left;
+            font-family: 'Cinzel', serif;
+            font-size: 5rem;
+            line-height: 1;
+            padding-right: 15px;
+            color: var(--accent-gold);
         }
 
-        .letter-paragraph.visible {
+        .paragraph {
+            font-size: 1.4rem;
+            line-height: 2;
+            margin-bottom: 40px;
+            text-align: justify;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: 1.5s all ease;
+            color: rgba(244, 241, 234, 0.9);
+        }
+
+        .paragraph.visible {
             opacity: 1;
             transform: translateY(0);
         }
 
-        .highlight-large {
-            display: block;
+        .paragraph:hover {
+            color: var(--text-light);
+            text-shadow: 0 0 10px rgba(229, 179, 164, 0.3);
+        }
+
+        /* --- Special Accents --- */
+        .te-amo-section {
             text-align: center;
-            font-size: 4rem;
-            font-family: 'Great Vibes', cursive;
-            color: var(--dark-rose);
-            margin: 50px 0;
+            padding: 100px 0;
+        }
+
+        .te-amo-text {
+            font-family: 'Parisienne', cursive;
+            font-size: 8rem;
+            background: linear-gradient(to right, var(--accent-gold), var(--rose-gold), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            animation: gradientMove 5s infinite linear;
+            background-size: 200% auto;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .divider {
+            width: 100px;
+            height: 1px;
+            background: var(--accent-gold);
+            margin: 40px auto;
             position: relative;
         }
 
-        .highlight-large::before, .highlight-large::after {
-            content: " — ";
-            color: var(--gold);
+        .divider::after {
+            content: '✧';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--accent-gold);
         }
 
-        .quote-block {
-            border-left: 4px solid var(--primary-rose);
-            padding-left: 30px;
-            margin: 40px 0;
-            font-style: italic;
-            background: rgba(255, 77, 109, 0.05);
-            padding: 20px 40px;
-            border-radius: 0 20px 20px 0;
-        }
-
-        /* --- Secciones Especiales --- */
-        .promises-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        /* --- Verses Section --- */
+        .verses-container {
+            display: flex;
+            flex-direction: column;
             gap: 20px;
-            margin: 40px 0;
+            margin: 60px 0;
+            padding-left: 40px;
+            border-left: 1px solid var(--deep-rose);
         }
 
-        .promise-item {
-            background: rgba(255, 255, 255, 0.5);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px dashed var(--primary-rose);
-            font-size: 1.1rem;
-            transition: transform 0.3s;
+        .verse-line {
+            font-style: italic;
+            font-size: 1.5rem;
+            color: var(--rose-gold);
         }
 
-        .promise-item:hover {
-            transform: scale(1.05);
-            background: #fff;
-        }
-
-        /* --- Footer --- */
-        footer {
+        /* --- Interactive Footer --- */
+        .footer-reveal {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            padding: 100px 20px;
-            background: linear-gradient(to top, #ffccd5, transparent);
         }
 
-        .signature {
-            font-family: 'Great Vibes', cursive;
-            font-size: 3rem;
-            color: var(--dark-rose);
-            margin-top: 20px;
-        }
-
-        .final-btn {
-            background: var(--primary-rose);
-            color: white;
-            border: none;
+        .reveal-btn {
+            background: transparent;
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
             padding: 15px 40px;
-            font-size: 1.2rem;
-            border-radius: 50px;
+            font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+            letter-spacing: 4px;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3);
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 30px;
+            transition: 0.4s;
+            position: relative;
+            overflow: hidden;
         }
 
-        .final-btn:hover {
-            transform: scale(1.1) translateY(-5px);
-            background: var(--dark-rose);
-        }
-
-        /* --- Animaciones --- */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-10px);}
-            60% {transform: translateY(-5px);}
+        .reveal-btn:hover {
+            background: var(--accent-gold);
+            color: var(--bg-color);
+            box-shadow: 0 0 30px rgba(197, 164, 126, 0.4);
         }
 
         /* --- Responsive --- */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 3rem; }
-            .letter-card { padding: 30px; }
-            .highlight-large { font-size: 3rem; }
-            .promises-grid { grid-template-columns: 1fr; }
-            .letter-paragraph { font-size: 1.1rem; text-align: left; }
+            .glass-sheet { padding: 40px 20px; }
+            .te-amo-text { font-size: 4rem; }
+            .hero-title { font-size: 3.5rem; }
+            .paragraph { font-size: 1.1rem; }
+            .floating-flower { width: 150px; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Loader -->
-    <div id="loader">
-        <div class="loader-heart">❤</div>
-        <p style="font-family: 'Dancing Script', cursive; font-size: 1.5rem; margin-top: 20px; color: #800f2f;">
-            Preparando algo especial para ti...
-        </p>
+    <div id="cursor-dot"></div>
+    
+    <div id="preloader">
+        <div class="loader-text">CARGANDO TU UNIVERSO</div>
     </div>
 
-    <!-- Fondo de Partículas -->
-    <canvas id="canvas-bg"></canvas>
+    <canvas id="canvas-nebula"></canvas>
 
-    <!-- Sección de Inicio -->
+    <!-- Hero -->
     <section class="hero">
-        <h1>Para la mujer de mi vida</h1>
-        <p>14 de Febrero • Nuestro momento</p>
-        <div class="scroll-down">↓</div>
+        <img src="https://www.transparentpng.com/download/floral/vintage-flower-decoration-png-21.png" class="floating-flower" style="top: 10%; left: -5%; transform: rotate(45deg);">
+        <img src="https://www.transparentpng.com/download/floral/vintage-flower-decoration-png-21.png" class="floating-flower" style="bottom: 10%; right: -5%; transform: rotate(-135deg);">
+        
+        <h1 class="hero-title">Mi lugar favorito</h1>
+        <div class="hero-subtitle">14 DE FEBRERO</div>
     </section>
 
-    <!-- Contenido Principal -->
-    <div class="content-wrapper">
-        <article class="letter-card">
-            <!-- Decoraciones SVG -->
-            <svg class="corner-decor top-right" viewBox="0 0 100 100">
-                <path d="M0,0 Q50,0 50,50 Q100,50 100,100" fill="none" stroke="#ff4d6d" stroke-width="2"/>
-            </svg>
-            <svg class="corner-decor bottom-left" viewBox="0 0 100 100">
-                <path d="M0,0 Q50,0 50,50 Q100,50 100,100" fill="none" stroke="#ff4d6d" stroke-width="2"/>
-            </svg>
-
-            <!-- El Mensaje (Dividido para animaciones) -->
-            <div class="letter-paragraph">
-                Hoy, 14 de febrero, no quiero escribirte un simple mensaje… quiero escribirte una promesa envuelta en palabras, un abrazo convertido en letras, un pedacito de mi alma entregado en cada línea.
+    <div class="main-container">
+        <article class="glass-sheet">
+            
+            <div class="paragraph">
+                <span class="drop-cap">H</span>oy, 14 de febrero, no quiero escribirte un simple mensaje… quiero escribirte una promesa envuelta en palabras, un abrazo convertido en letras, un pedacito de mi alma entregado en cada línea.
             </div>
 
-            <div class="highlight-large">Te amo.</div>
+            <div class="te-amo-section">
+                <h2 class="te-amo-text">Te amo.</h2>
+            </div>
 
-            <div class="letter-paragraph">
+            <div class="paragraph">
                 Y cuando lo digo, no lo digo como una frase bonita que se pierde en el aire. Lo digo como algo que nace profundo, que crece cada día, que late fuerte cuando pienso en ti. Te amo con la certeza de quien ha encontrado algo valioso, algo que no quiere perder jamás. Me importas demasiado, más de lo que imaginas, más de lo que a veces logro demostrar. Eres parte de mis pensamientos diarios, de mis sueños despierto, de mis ilusiones más sinceras.
             </div>
 
-            <div class="letter-paragraph">
+            <div class="divider"></div>
+
+            <div class="paragraph">
                 Desde que llegaste a mi vida, todo tiene un brillo diferente. No hiciste magia… fuiste tú. Tu forma tan única de ser, tu esencia tan auténtica, tu manera de hablar, de reír, de mirar. Me enamoré sin darme cuenta, poco a poco, detalle por detalle. Me enamoré de tu corazón, de tu mente, de tu luz.
             </div>
 
-            <div class="letter-paragraph">
+            <div class="paragraph" style="border-right: 1px solid var(--deep-rose); padding-right: 20px;">
                 Me encanta pasar tiempo contigo, y no importa cómo ni dónde. Si estamos caminando, si estamos hablando por horas, si estamos compartiendo un momento sencillo… para mí todo se vuelve especial solo porque estás tú. Contigo el tiempo no pesa, no corre, no se siente igual. Se transforma en algo suave, en algo que quisiera guardar para siempre.
             </div>
 
-            <div class="letter-paragraph quote-block">
+            <div class="paragraph" style="background: rgba(229, 179, 164, 0.05); padding: 30px; border-radius: 4px;">
                 Contigo me siento feliz, pero no es una felicidad ruidosa o superficial. Es una felicidad tranquila, profunda, de esas que te llenan por dentro y te hacen sentir completo. Me haces sentir seguro, amado, escuchado. Me haces sentir que puedo ser yo mismo sin miedo, sin máscaras, sin dudas. Y eso es un regalo enorme.
             </div>
 
-            <div class="letter-paragraph">
+            <div class="paragraph">
                 Me tienes completamente enamorado. Enamorado de tu sonrisa que ilumina incluso mis días más grises. Enamorado de tus pensamientos, de tus sueños, de tus metas. Enamorado de tu fuerza, de tu dulzura, de tu manera tan tuya de existir. Eres diferente, y esa diferencia es lo que te hace tan increíble.
             </div>
 
-            <div class="letter-paragraph">
+            <div class="divider"></div>
+
+            <div class="paragraph">
                 Quiero pasar mucho tiempo a tu lado. No solo momentos bonitos, sino procesos completos. Quiero vivir contigo las etapas que vengan, crecer juntos, apoyarnos cuando algo duela, celebrarnos cuando algo salga bien. Quiero cumplir nuestras promesas, construir sueños en conjunto, trazar planes que nos incluyan siempre a los dos.
             </div>
 
-            <div class="letter-paragraph">
+            <div class="paragraph">
                 Quiero aprender contigo. Aprender a amar mejor, a escuchar mejor, a entender más. Quiero que nos enseñemos mutuamente a ser más fuertes, más pacientes, más valientes. Quiero que nuestro amor no solo sea sentimiento, sino también decisión, compromiso y cuidado.
             </div>
 
-            <div class="letter-paragraph">
+            <div class="paragraph">
                 Quiero hacer muchas cosas contigo: reír hasta que falte el aire, hablar hasta que amanezca, abrazarte sin prisas, caminar de la mano sin importar el destino. Quiero crear recuerdos que se queden tatuados en el alma. Quiero mirar atrás algún día y sonreír al recordar todo lo que construimos juntos.
             </div>
 
-            <div class="promises-grid">
-                <div class="letter-paragraph promise-item">Si la vida es un viaje, quiero que seas mi compañera de camino.</div>
-                <div class="letter-paragraph promise-item">Si el mundo se vuelve difícil, quiero ser tu apoyo.</div>
-                <div class="letter-paragraph promise-item">Si dudas de ti, quiero recordarte lo increíble que eres.</div>
-                <div class="letter-paragraph promise-item">Si el tiempo intenta separarnos, quiero luchar para que nos encuentre más fuertes.</div>
+            <div class="verses-container">
+                <div class="verse-line">Si la vida es un viaje, quiero que seas mi compañera de camino.</div>
+                <div class="verse-line">Si el mundo se vuelve difícil, quiero ser tu apoyo.</div>
+                <div class="verse-line">Si dudas de ti, quiero recordarte lo increíble que eres.</div>
+                <div class="verse-line">Si el tiempo intenta separarnos, quiero luchar para que nos encuentre más fuertes.</div>
             </div>
 
-            <div class="letter-paragraph">
+            <div class="paragraph">
                 Eres mi lugar favorito. Mi calma. Mi inspiración. Mi motivo para sonreír sin razón aparente. Eres ese pensamiento que aparece de repente y me cambia el ánimo por completo.
             </div>
 
-            <div class="letter-paragraph">
+            <div class="paragraph">
                 No sé cuánto tiempo nos regale la vida, pero sí sé que quiero aprovechar cada segundo contigo. Quiero elegirte todos los días, incluso cuando sea difícil, incluso cuando haya retos. Porque amarte no es solo un sentimiento bonito… es una decisión que tomo con orgullo.
             </div>
 
-            <div class="letter-paragraph" style="text-align: center; font-weight: bold; font-size: 1.5rem; margin-top: 50px;">
+            <div class="paragraph" style="text-align: center; font-family: 'Cinzel', serif; color: var(--accent-gold); letter-spacing: 3px;">
                 Gracias por existir. Gracias por ser tú, tan real, tan única, tan especial. Gracias por hacerme sentir este amor que me llena y me transforma.
             </div>
+
         </article>
     </div>
 
-    <footer>
-        <div class="signature">Con todo mi amor eterno</div>
-        <p>Presiona aquí si aceptas ser mi San Valentín hoy y siempre</p>
-        <a href="#" class="final-btn" onclick="celebrar()">¡Sí, acepto!</a>
-    </footer>
+    <section class="footer-reveal">
+        <h3 style="font-family: 'Parisienne', cursive; font-size: 3rem; margin-bottom: 30px;">Siempre tú.</h3>
+        <button class="reveal-btn" onclick="alert('Eres lo mejor que me ha pasado. ❤️')">Toca mi corazón</button>
+    </section>
 
-    <!-- Audio (Opcional: puedes poner un link a un mp3 si lo tienes) -->
-    <!-- <audio id="bgMusic" src="musica_romantica.mp3" loop></audio> -->
-
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
-        // --- Loader ---
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('loader');
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 1000);
-            }, 2000);
+        // --- Custom Cursor Logic ---
+        const cursor = document.getElementById('cursor-dot');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            // Sparkles
+            if (Math.random() > 0.8) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = e.clientX + 'px';
+                sparkle.style.top = e.clientY + 'px';
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 1000);
+            }
         });
 
-        // --- Sistema de Partículas (Pétalos y Corazones) ---
-        const canvas = document.getElementById('canvas-bg');
+        // --- Nebula Canvas Background ---
+        const canvas = document.getElementById('canvas-nebula');
         const ctx = canvas.getContext('2d');
-        let particles = [];
+        let stars = [];
 
-        function resize() {
+        function initCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height - canvas.height;
-                this.size = Math.random() * 15 + 5;
-                this.speed = Math.random() * 2 + 1;
-                this.rotation = Math.random() * 360;
-                this.rotSpeed = Math.random() * 2 - 1;
-                this.type = Math.random() > 0.5 ? 'heart' : 'petal';
-                this.color = ['#ff4d6d', '#ff758f', '#ffb3c1', '#fb6f92'][Math.floor(Math.random() * 4)];
-            }
-
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.rotation * Math.PI / 180);
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = 0.6;
-
-                if (this.type === 'heart') {
-                    ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.bezierCurveTo(-this.size/2, -this.size/2, -this.size, this.size/3, 0, this.size);
-                    ctx.bezierCurveTo(this.size, this.size/3, this.size/2, -this.size/2, 0, 0);
-                    ctx.fill();
-                } else {
-                    ctx.beginPath();
-                    ctx.ellipse(0, 0, this.size/2, this.size, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.restore();
-            }
-
-            update() {
-                this.y += this.speed;
-                this.rotation += this.rotSpeed;
-                if (this.y > canvas.height) {
-                    this.y = -20;
-                    this.x = Math.random() * canvas.width;
-                }
+            stars = [];
+            for(let i=0; i<200; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 0.5
+                });
             }
         }
 
-        for (let i = 0; i < 70; i++) {
-            particles.push(new Particle());
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
+        function drawStars() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            stars.forEach(s => {
+                ctx.globalAlpha = Math.random();
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+                ctx.fill();
+                s.y -= s.speed;
+                if(s.y < 0) s.y = canvas.height;
             });
-            requestAnimationFrame(animate);
+            requestAnimationFrame(drawStars);
         }
-        animate();
 
-        // --- Animación de Entrada de Texto (Intersection Observer) ---
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: "0px 0px -50px 0px"
-        };
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        drawStars();
 
+        // --- Intersection Observer for Paragraphs ---
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
+                if(entry.isIntersecting) {
                     entry.target.classList.add('visible');
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
 
-        document.querySelectorAll('.letter-paragraph').forEach(p => {
-            observer.observe(p);
+        document.querySelectorAll('.paragraph').forEach(p => observer.observe(p));
+
+        // --- Preloader Removal ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('preloader').style.display = 'none';
+            }, 2000);
         });
 
-        // --- Botón Final (Confetti) ---
-        function celebrar() {
-            const duration = 15 * 1000;
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-            function randomInRange(min, max) {
-              return Math.random() * (max - min) + min;
-            }
-
-            const interval = setInterval(function() {
-              const timeLeft = animationEnd - Date.now();
-
-              if (timeLeft <= 0) {
-                return clearInterval(interval);
-              }
-
-              const particleCount = 50 * (timeLeft / duration);
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
-
-            alert("Has hecho a la persona más feliz del mundo ❤️");
-        }
+        // --- Parallax for Flowers ---
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.floating-flower').forEach((flower, index) => {
+                const speed = (index + 1) * 0.2;
+                flower.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.1}deg)`;
+            });
+        });
     </script>
 </body>
 </html>
