@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heart_OS_v7.0_Stable_Build.exe</title>
+    <title>Heart_OS_v8.0_Amapolas_Edition.exe</title>
     
-    <!-- Recursos de Alta Gama -->
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Dancing+Script:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Librerías de Élite -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&family=Plus+Jakarta+Sans:wght@200;400;800&family=Dancing+Script:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -14,710 +14,363 @@
 
     <style>
         :root {
-            --bg-deep: #020306;
-            --surface-low: #080a0f;
-            --surface-mid: #0f121a;
-            --cyan: #00f2ff;
-            --pink: #ff2d55;
-            --green: #39ff14;
-            --purple: #bc13fe;
-            --glass: rgba(15, 20, 30, 0.75);
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #f1f5f9;
+            --bg: #03050a;
+            --accent-cyan: #00f2ff;
+            --accent-pink: #ff2d55;
+            --accent-green: #39ff14;
+            --accent-gold: #ffcc00;
+            --glass: rgba(10, 15, 30, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f1f5f9;
             --text-dim: #94a3b8;
-            --f-mono: 'Fira Code', monospace;
-            --f-sans: 'Plus Jakarta Sans', sans-serif;
-            --f-special: 'Dancing Script', cursive;
         }
 
-        /* --- Reset & Layout Base --- */
+        /* --- Estilos Base --- */
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
         
         body {
-            background-color: var(--bg-deep);
-            color: var(--text);
-            font-family: var(--f-sans);
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
             scroll-behavior: smooth;
-            -webkit-font-smoothing: antialiased;
         }
 
-        /* --- Global Background Elements --- */
-        #star-canvas {
-            position: fixed;
-            top: 0; left: 0; z-index: -1;
-            opacity: 0.4;
-        }
+        /* --- Capas de Fondo --- */
+        #star-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.5; }
+        #matrix-bg { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.1; font-family: 'Fira Code'; font-size: 10px; pointer-events: none; }
+        .vignette { position: fixed; inset: 0; background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.9) 100%); pointer-events: none; z-index: 100; }
 
-        #matrix-overlay {
-            position: fixed;
-            top: 0; left: 0; z-index: -1;
-            opacity: 0.1;
-            font-family: var(--f-mono);
-            font-size: 10px;
-            pointer-events: none;
-        }
-
-        .vignette {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.9) 100%);
-            pointer-events: none;
-            z-index: 100;
-        }
-
-        /* --- Custom UI Components --- */
-        #scroll-bar {
-            position: fixed;
-            top: 0; left: 0; width: 0%; height: 4px;
-            background: linear-gradient(90deg, var(--cyan), var(--pink), var(--purple));
-            z-index: 2000;
-            box-shadow: 0 0 15px var(--pink);
-        }
-
-        #mouse-trail {
-            width: 25px; height: 25px;
-            border: 1px solid var(--cyan);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 10000;
-            transform: translate(-50%, -50%);
-            transition: transform 0.1s ease-out, background 0.3s;
-            box-shadow: 0 0 15px var(--cyan);
-        }
-
-        /* --- Loader / Boot Sequence (PRO) --- */
+        /* --- Boot Sequence --- */
         #boot-screen {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 99999;
-            padding: 50px;
-            font-family: var(--f-mono);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
+            position: fixed; inset: 0; background: #000; z-index: 99999;
+            padding: 40px; font-family: 'Fira Code', monospace; display: flex; flex-direction: column;
         }
+        .boot-line { font-size: 13px; margin-bottom: 4px; opacity: 0; }
+        .cyan { color: var(--accent-cyan); }
+        .pink { color: var(--accent-pink); }
+        .green { color: var(--accent-green); }
 
-        .boot-line { font-size: 12px; margin-bottom: 3px; opacity: 0; color: #fff; }
-        .c-c { color: var(--cyan); }
-        .c-p { color: var(--pink); }
-        .c-g { color: var(--green); }
+        /* --- Layout --- */
+        .wrapper { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
 
-        /* --- Header Section --- */
+        /* --- Hero Section --- */
         .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
+            height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
         }
 
-        .badge {
-            font-family: var(--f-mono);
-            font-size: 10px;
-            padding: 8px 20px;
-            border-radius: 50px;
-            background: rgba(0, 242, 255, 0.05);
-            border: 1px solid var(--cyan);
-            color: var(--cyan);
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        .version-tag {
+            font-family: 'Fira Code'; background: rgba(0, 242, 255, 0.1);
+            border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
+            padding: 6px 20px; border-radius: 50px; font-size: 11px;
+            letter-spacing: 3px; margin-bottom: 25px; box-shadow: 0 0 20px rgba(0,242,255,0.2);
         }
 
         .main-title {
-            font-size: clamp(3rem, 18vw, 9rem);
-            font-weight: 800;
-            letter-spacing: -8px;
-            line-height: 0.8;
-            background: linear-gradient(180deg, #fff 0%, var(--pink) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 40px;
+            font-size: clamp(3rem, 15vw, 8rem); font-weight: 800;
+            letter-spacing: -6px; line-height: 0.85; margin-bottom: 20px;
+            background: linear-gradient(180deg, #fff 0%, var(--accent-pink) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        /* --- Biometric Image Cards --- */
-        .vault-container {
-            display: flex;
-            gap: 50px;
-            justify-content: center;
-            width: 100%;
-            margin-top: 50px;
-            perspective: 1500px;
+        /* --- Biometric Image Vault --- */
+        .vault { display: flex; gap: 40px; margin: 60px 0; justify-content: center; width: 100%; perspective: 1000px; }
+        .vault-card {
+            width: 300px; height: 420px; background: var(--glass);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            position: relative; overflow: hidden; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            backdrop-filter: blur(15px);
+        }
+        .vault-card:hover { transform: translateY(-15px) rotateY(10deg); border-color: var(--card-color); box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px var(--card-glow); }
+        .vault-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.6s; filter: grayscale(0.5); }
+        .vault-card:hover .vault-img { opacity: 1; filter: grayscale(0); transform: scale(1.1); }
+        .scan-laser { position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--card-color); box-shadow: 0 0 15px var(--card-color); animation: scan 3s infinite linear; z-index: 10; }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+        .vault-label { position: absolute; bottom: 20px; left: 20px; right: 20px; background: rgba(0,0,0,0.85); padding: 15px; border-radius: 12px; font-family: 'Fira Code'; font-size: 11px; border-left: 4px solid var(--card-color); z-index: 20; }
+
+        /* --- Music Player Floating UI --- */
+        #music-player-ui {
+            position: fixed; bottom: 30px; left: 30px; width: 320px;
+            background: rgba(15, 20, 35, 0.9); backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 20px;
+            padding: 20px; z-index: 5000; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateX(-120%); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #music-player-ui.active { transform: translateX(0); }
+        .album-art { width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(45deg, var(--accent-pink), #ff758c); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; position: relative; }
+        .wave-bar { width: 3px; background: #fff; border-radius: 10px; animation: wave 1.2s infinite ease-in-out; }
+        @keyframes wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }
+        .play-btn { background: var(--accent-cyan); border: none; width: 40px; height: 40px; border-radius: 50%; color: #000; cursor: pointer; transition: 0.3s; }
+        .play-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--accent-cyan); }
+
+        /* --- Message Cards --- */
+        .content-section { margin: 100px 0; }
+        .msg-block {
+            background: rgba(255,255,255,0.02); border-left: 2px solid var(--accent-pink);
+            padding: 50px; border-radius: 0 30px 30px 0; margin-bottom: 60px;
+            opacity: 0; transform: translateX(-50px); transition: 1s ease;
+        }
+        .msg-block.reveal { opacity: 1; transform: translateX(0); }
+        .msg-block p { font-size: 1.25rem; line-height: 2; color: #cbd5e1; text-align: justify; }
+        
+        .special-quote {
+            font-family: 'Dancing Script', cursive; font-size: clamp(3.5rem, 9vw, 6.5rem);
+            text-align: center; margin: 120px 0; color: var(--accent-pink);
+            text-shadow: 0 0 40px rgba(255, 45, 85, 0.4); opacity: 0; transform: scale(0.8);
         }
 
-        .biometric-card {
-            width: 320px;
-            height: 450px;
-            background: var(--surface-low);
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            position: relative;
-            overflow: hidden;
-            transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1);
-            backdrop-filter: blur(20px);
-        }
+        .code-piropo { font-family: 'Fira Code'; font-size: 14px; color: var(--accent-cyan); margin-bottom: 20px; opacity: 0.7; }
 
-        .biometric-card:hover {
-            transform: translateY(-25px) rotateX(8deg) rotateY(-5deg);
-            border-color: var(--theme-color);
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 30px var(--theme-glow);
-        }
+        /* --- API & Timeline --- */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin: 100px 0; }
+        .dash-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 35px; border-radius: 25px; }
+        .dash-card h3 { font-family: 'Fira Code'; font-size: 14px; color: var(--accent-green); margin-bottom: 20px; text-transform: uppercase; }
+        .git-commit { border-left: 2px solid #30363d; padding-left: 30px; margin-left: 10px; position: relative; }
+        .git-commit::before { content: ''; position: absolute; left: -7px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
 
-        .bio-img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            opacity: 0.6;
-            transition: 0.6s;
-            filter: saturate(0.5);
-        }
-
-        .biometric-card:hover .bio-img {
-            opacity: 1; filter: saturate(1.2); transform: scale(1.1);
-        }
-
-        .laser-scanner {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 3px;
-            background: var(--theme-color);
-            box-shadow: 0 0 20px var(--theme-color);
-            animation: scanning 3.5s infinite ease-in-out;
-            z-index: 10;
-        }
-
-        @keyframes scanning { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
-
-        .bio-data {
-            position: absolute;
-            bottom: 30px; left: 30px; right: 30px;
-            background: rgba(0,0,0,0.85);
-            padding: 20px;
-            border-radius: 15px;
-            border-left: 5px solid var(--theme-color);
-            font-family: var(--f-mono);
-            font-size: 11px;
-            z-index: 20;
-            backdrop-filter: blur(10px);
-        }
-
-        /* --- Dashboard Sections --- */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            margin: 150px 0;
-        }
-
-        .dash-widget {
-            background: var(--surface-mid);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .widget-header {
-            font-family: var(--f-mono);
-            font-size: 12px;
-            color: var(--cyan);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .stat-label { color: var(--text-dim); }
-        .stat-val { font-weight: 700; color: var(--green); font-family: var(--f-mono); }
-
-        .progress-container {
-            width: 100%; height: 8px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            margin: 10px 0 20px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--cyan), var(--green));
-            width: 0%;
-            transition: 3s cubic-bezier(0.1, 0, 0.2, 1);
-        }
-
-        /* --- The Great Letter Section --- */
-        .letter-container {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .letter-block {
-            margin-bottom: 120px;
-            opacity: 0;
-            transform: translateY(50px);
-            transition: 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .letter-block.reveal { opacity: 1; transform: translateY(0); }
-
-        .letter-content {
-            font-size: 1.4rem;
-            line-height: 2.1;
-            color: var(--text-dim);
-            position: relative;
-            padding-left: 40px;
-            border-left: 2px solid var(--border);
-        }
-
-        .letter-content strong {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        .letter-block.special .letter-content {
-            border-left: 3px solid var(--pink);
-            background: linear-gradient(90deg, rgba(255, 45, 85, 0.05) 0%, transparent 100%);
-            padding: 40px;
-            border-radius: 0 30px 30px 0;
-        }
-
-        .dancing-callout {
-            font-family: var(--f-special);
-            font-size: clamp(3.5rem, 8vw, 7rem);
-            color: var(--pink);
-            text-align: center;
-            margin: 100px 0;
-            text-shadow: 0 0 40px rgba(255, 45, 85, 0.4);
-            filter: drop-shadow(0 0 10px var(--pink));
-        }
-
-        /* --- Valentine API Documentation --- */
-        .api-docs {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 20px;
-            padding: 50px;
-            font-family: var(--f-mono);
-            margin: 150px 0;
-        }
-
-        .api-tag {
-            background: var(--green);
-            color: #000;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-weight: 800;
-            font-size: 12px;
-            margin-right: 15px;
-        }
-
-        .api-endpoint { color: var(--cyan); font-size: 14px; }
-
-        .code-window {
-            background: #000;
-            padding: 30px;
-            border-radius: 12px;
-            margin-top: 30px;
-            border: 1px solid #222;
-            color: #7ee787;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        /* --- Interactive List Section --- */
-        .vow-list {
-            margin: 100px 0;
-            list-style: none;
-        }
-
-        .vow-item {
-            padding: 30px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            transition: 0.4s;
-        }
-
-        .vow-item:hover {
-            border-color: var(--pink);
-            transform: translateX(20px);
-            background: rgba(255, 45, 85, 0.05);
-        }
-
-        .vow-icon {
-            width: 50px; height: 50px;
-            background: rgba(255, 45, 85, 0.1);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--pink);
-            font-size: 20px;
-        }
-
-        /* --- Timeline of Commits --- */
-        .git-timeline {
-            position: relative;
-            padding-left: 50px;
-            margin: 150px 0;
-        }
-
-        .git-timeline::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-            width: 2px; background: #1b1f23;
-        }
-
-        .commit {
-            position: relative;
-            margin-bottom: 60px;
-        }
-
-        .commit::before {
-            content: ''; position: absolute; left: -56px; top: 10px;
-            width: 12px; height: 12px; border-radius: 50%;
-            background: var(--green); box-shadow: 0 0 15px var(--green);
-        }
-
-        .commit-box {
-            background: var(--surface-low);
-            padding: 30px;
-            border-radius: 15px;
-            border: 1px solid var(--border);
-        }
-
-        /* --- Footer Floating Audio --- */
-        #music-widget {
-            position: fixed;
-            bottom: 40px; right: 40px;
-            width: 320px;
-            background: var(--glass);
-            backdrop-filter: blur(30px);
-            border: 1px solid var(--glass-border);
-            padding: 20px;
-            border-radius: 25px;
-            z-index: 5000;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-        }
-
-        .album-art {
-            width: 60px; height: 60px;
-            border-radius: 15px;
-            background: linear-gradient(45deg, var(--pink), var(--purple));
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; color: #fff;
-            animation: rotateHeart 10s infinite linear;
-        }
-
-        @keyframes rotateHeart { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* --- Final Button --- */
+        /* --- Final Section --- */
+        footer { padding: 150px 0 100px; text-align: center; }
         .finalize-btn {
-            background: transparent;
-            border: 2px solid var(--cyan);
-            color: var(--cyan);
-            padding: 30px 80px;
-            font-family: var(--f-mono);
-            font-weight: 700;
-            font-size: 16px;
-            letter-spacing: 5px;
-            border-radius: 100px;
-            cursor: pointer;
-            transition: 0.5s;
-            position: relative;
-            overflow: hidden;
-            display: block;
-            margin: 100px auto;
+            background: transparent; border: 2px solid var(--accent-cyan); color: var(--accent-cyan);
+            padding: 25px 60px; border-radius: 100px; font-family: 'Fira Code'; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 4px; cursor: pointer; transition: 0.5s;
         }
+        .finalize-btn:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 50px var(--accent-cyan); transform: scale(1.05); }
 
-        .finalize-btn:hover {
-            background: var(--cyan);
-            color: #000;
-            box-shadow: 0 0 60px var(--cyan);
-            transform: scale(1.05);
-        }
+        /* --- Pétalos Animados --- */
+        .petal { position: fixed; top: -10%; pointer-events: none; z-index: 1000; color: #ff2d55; font-size: 20px; }
 
-        /* --- Mobile Optimization --- */
         @media (max-width: 768px) {
-            .vault-container { flex-direction: column; align-items: center; }
-            .dashboard { grid-template-columns: 1fr; }
-            .letter-content { font-size: 1.1rem; line-height: 1.8; padding-left: 20px; }
-            .main-title { font-size: 3.5rem; letter-spacing: -3px; }
-            #music-widget { display: none; }
+            .vault { flex-direction: column; align-items: center; }
+            .main-title { font-size: 3.5rem; }
+            .msg-block { padding: 30px; }
+            #music-player-ui { width: calc(100% - 60px); }
         }
     </style>
 </head>
 <body>
 
-    <div id="scroll-bar"></div>
-    <div id="mouse-trail"></div>
     <div id="boot-screen"></div>
-    <div id="matrix-overlay"></div>
     <canvas id="star-canvas"></canvas>
+    <div id="matrix-bg"></div>
     <div class="vignette"></div>
 
+    <!-- Reproductor de Audio (Oculto) -->
+    <audio id="love-song" src="amapolas.mp3" loop></audio>
+
+    <!-- Reproductor de Música UI -->
+    <div id="music-player-ui">
+        <div class="album-art" id="visualizer-container">
+            <i class="fas fa-compact-disc fa-spin"></i>
+        </div>
+        <div style="flex: 1">
+            <div style="font-weight: 800; font-size: 14px;">Amapolas.mp3</div>
+            <div style="font-size: 11px; color: var(--accent-cyan); font-family: 'Fira Code';">Now Playing: Tu canción</div>
+        </div>
+        <button class="play-btn" onclick="togglePlay()"><i class="fas fa-play" id="play-icon"></i></button>
+    </div>
+
     <div id="main-content" style="opacity: 0; pointer-events: none;">
-        
-        <div class="wrapper" style="max-width: 1300px; margin: 0 auto; padding: 0 40px;">
+        <div class="wrapper">
             
-            <!-- Hero Section -->
             <header class="hero">
-                <div class="badge">system_core: activated | Valentine_build_7.0</div>
-                <h1 class="main-title">Heart_OS</h1>
-                <p style="font-family: var(--f-mono); color: var(--cyan); letter-spacing: 2px; font-size: 14px;">
-                    // Connecting to the most special soul in the universe... [CONNECTED]
+                <div class="version-tag">status: infinite_love | stable_build v8.0</div>
+                <h1 class="main-title">Heart_OS<br>Amapolas</h1>
+                <p style="font-family: 'Fira Code'; color: var(--accent-cyan); font-size: 13px;">
+                    // Compiled with 100% devotion | Stabilizing emotions... OK
                 </p>
 
-                <div class="vault-container">
+                <div class="vault">
                     <!-- FOTO PINGÜINO -->
-                    <div class="biometric-card" style="--theme-color: var(--cyan); --theme-glow: rgba(0,242,255,0.4);">
-                        <div class="laser-scanner"></div>
-                        <img src="pinguino.jpg" alt="Pinguino" class="bio-img">
-                        <div class="bio-data">
-                            <span class="c-g">[SUCCESS]</span> Entity: Pinguino.unit <br>
-                            <span class="c-c">Function: Protección Eterna</span>
+                    <div class="vault-card" style="--card-color: var(--accent-cyan); --card-glow: rgba(0,242,255,0.4)">
+                        <div class="scan-laser"></div>
+                        <img src="pinguino.jpg" alt="Pinguino" class="vault-img">
+                        <div class="vault-label">
+                            <span class="green">[BIO_AUTH]</span> pinguino.sys <br>
+                            <span class="cyan">Status: Protegiéndote siempre</span>
                         </div>
                     </div>
 
                     <!-- FOTO TORTUGA -->
-                    <div class="biometric-card" style="--theme-color: var(--green); --theme-glow: rgba(57,255,20,0.4);">
-                        <div class="laser-scanner"></div>
-                        <img src="tortuga.avif" alt="Tortuga" class="bio-img">
-                        <div class="bio-data">
-                            <span class="c-g">[SUCCESS]</span> Entity: Tortuga.unit <br>
-                            <span class="c-g">Function: Calma Absoluta</span>
+                    <div class="vault-card" style="--card-color: var(--accent-green); --card-glow: rgba(57,255,20,0.4)">
+                        <div class="scan-laser"></div>
+                        <img src="tortuga.avif" alt="Tortuga" class="vault-img">
+                        <div class="vault-label">
+                            <span class="green">[BIO_AUTH]</span> tortuga.sys <br>
+                            <span class="green">Status: Calma infinita a tu lado</span>
                         </div>
                     </div>
                 </div>
+                <p style="margin-top: 20px; color: var(--text-dim); font-size: 0.8rem; font-family: 'Fira Code'; animate: breathe 2s infinite;">
+                    [ HAZ CLIC EN PLAY PARA SINTONIZAR ]
+                </p>
             </header>
 
-            <!-- Status Dashboard -->
-            <section class="dashboard">
-                <div class="dash-widget reveal">
-                    <div class="widget-header"><i class="fas fa-heartbeat"></i> Biometric_Data</div>
-                    <div class="stat-row"><span class="stat-label">Connection_Type</span><span class="stat-val">Soul-to-Soul</span></div>
-                    <div class="stat-row"><span class="stat-label">Heartbeat_Sync</span><span class="stat-val">100%</span></div>
-                    <div class="stat-row"><span class="stat-label">Devotion_Level</span><span class="stat-val">∞</span></div>
-                </div>
-
-                <div class="dash-widget reveal">
-                    <div class="widget-header"><i class="fas fa-brain"></i> Neural_Status</div>
-                    <div class="stat-row"><span class="stat-label">Happiness_Index</span><span class="stat-val">MAX</span></div>
-                    <div class="progress-container"><div class="progress-fill" style="width: 100%;"></div></div>
-                    <div class="stat-row"><span class="stat-label">Safety_Feeling</span><span class="stat-val">Secure</span></div>
-                    <div class="progress-container"><div class="progress-fill" style="width: 100%; background: var(--purple);"></div></div>
-                </div>
-
-                <div class="dash-widget reveal">
-                    <div class="widget-header"><i class="fas fa-microchip"></i> Processor_Usage</div>
-                    <div class="stat-row"><span class="stat-label">Thoughts_RAM</span><span class="stat-val">99.9% YOU</span></div>
-                    <div class="stat-row"><span class="stat-label">Storage</span><span class="stat-val">Memories_Full</span></div>
-                    <div class="stat-row"><span class="stat-label">Uptime</span><span class="stat-val">Always Active</span></div>
-                </div>
-            </section>
-
-            <!-- The Great Letter (Part 1) -->
-            <section class="letter-container">
+            <main class="content-section">
                 
-                <div class="letter-block reveal special">
-                    <div class="letter-content">
-                        Hoy, 14 de febrero, no quiero regalarte solo palabras… quiero regalarte todo lo que siento cuando pienso en ti. Quiero que este mensaje sea como un abrazo largo, de esos que no tienen prisa, de esos que dicen más que mil frases cortas.
-                    </div>
+                <!-- BLOQUE 1 -->
+                <div class="msg-block reveal">
+                    <div class="code-piropo">// sudo apt-get install felicidad_eterna</div>
+                    <p>Hoy, 14 de febrero, no quiero regalarte solo palabras… quiero regalarte todo lo que siento cuando pienso en ti. Quiero que este mensaje sea como un abrazo largo, de esos que no tienen prisa, de esos que dicen más que mil frases cortas.</p>
                 </div>
 
-                <h2 class="dancing-callout reveal">Te amo.</h2>
+                <h2 class="special-quote scroll-reveal">Te amo.</h2>
 
-                <div class="letter-block reveal">
-                    <div class="letter-content">
-                        Y te amo de una forma que no sabía que existía hasta que llegaste tú. No es un amor ligero ni pasajero, es un amor que pesa bonito en el pecho, que se siente firme, que crece con cada recuerdo y con cada momento compartido. Me importas demasiado, más de lo que podría explicarte aunque escribiera mil páginas. Eres alguien esencial en mi vida, alguien que no solo está… sino que significa.
-                    </div>
+                <!-- BLOQUE 2 -->
+                <div class="msg-block reveal">
+                    <div class="code-piropo">while(heart.isBeating()) { love(you); }</div>
+                    <p>Y te amo de una forma que no sabía que existía hasta que llegaste tú. No es un amor ligero ni pasajero, es un amor que pesa bonito en el pecho, que se siente firme, que crece con cada recuerdo y con cada momento compartido. Me importas demasiado, más de lo que podría explicarte aunque escribiera mil páginas. Eres alguien esencial en mi vida, alguien que no solo está… sino que significa.</p>
                 </div>
 
-                <div class="letter-block reveal">
-                    <div class="letter-content">
-                        Me encanta pasar tiempo contigo, en cualquier lugar, haciendo cualquier cosa. No necesito planes perfectos ni escenarios extraordinarios; si estoy contigo, ya lo es todo. Porque tu presencia transforma lo simple en mágico. Una conversación contigo vale más que cualquier distracción. Una risa tuya puede arreglar un día entero. Incluso tus silencios me gustan, porque contigo el silencio no es vacío, es conexión.
-                    </div>
+                <!-- BLOQUE 3 -->
+                <div class="msg-block reveal">
+                    <p>Me encanta pasar tiempo contigo, en cualquier lugar, haciendo cualquier cosa. No necesito planes perfectos ni escenarios extraordinarios; si estoy contigo, ya lo es todo. Porque tu presencia transforma lo simple en mágico. Una conversación contigo vale más que cualquier distracción. Una risa tuya puede arreglar un día entero. Incluso tus silencios me gustan, porque contigo el silencio no es vacío, es conexión.</p>
                 </div>
 
-                <div class="letter-block reveal">
-                    <div class="letter-content">
-                        Me haces sentir feliz de una manera tan pura que a veces me sorprende. Es una felicidad que no grita, pero que se queda. Me haces sentir seguro, tranquilo, confiado. Contigo puedo ser yo mismo sin miedo a no ser suficiente. Y eso es algo que valoro más de lo que imaginas.
-                    </div>
-                </div>
-
-                <!-- API Docs Break -->
-                <div class="api-docs reveal">
-                    <div style="display:flex; align-items:center; margin-bottom: 20px;">
-                        <span class="api-tag">POST</span>
-                        <span class="api-endpoint">/heart/v7/feelings/deep_love</span>
-                    </div>
-                    <div class="code-window">
-                        { <br>
-                        &nbsp;&nbsp;"feeling": "Deeply enamorado", <br>
-                        &nbsp;&nbsp;"target": "Tú", <br>
-                        &nbsp;&nbsp;"reason": "Tu esencia única", <br>
-                        &nbsp;&nbsp;"attributes": ["Sonrisa", "Mirada", "Voz", "Gestos"], <br>
-                        &nbsp;&nbsp;"commit": "Para siempre" <br>
-                        }
-                    </div>
-                </div>
-
-                <div class="letter-block reveal">
-                    <div class="letter-content">
-                        Me tienes enamorado… profundamente enamorado. Enamorado de tu esencia, de tu forma tan única de ser. De tu manera de ver el mundo, de tus sueños, de tus metas. Me enamora tu sonrisa, tu mirada, tu voz, tus gestos pequeños que tal vez tú ni notas pero que yo guardo como tesoros. Me enamora tu corazón, tu sensibilidad, tu fuerza. Me enamora que seas tú.
-                    </div>
-                </div>
-
-                <div class="letter-block reveal">
-                    <div class="letter-content">
-                        Quiero pasar mucho tiempo a tu lado. No solo días bonitos, sino etapas completas. Quiero vivir procesos contigo, crecer juntos, enfrentar retos y superarlos tomados de la mano. Quiero cumplir nuestras promesas, crear nuevas, soñar en grande y trabajar para que esos sueños se vuelvan realidad.
-                    </div>
-                </div>
-
-                <div class="letter-block reveal">
-                    <div class="letter-content">
-                        Quiero verte lograr todo lo que te propongas. Quiero estar ahí cuando cumplas tus metas, cuando dudes de ti para recordarte lo increíble que eres, cuando necesites apoyo o simplemente alguien que te escuche. Quiero ser tu refugio cuando el mundo se sienta pesado y tu celebración cuando el mundo te sonría.
-                    </div>
-                </div>
-
-                <!-- Vow List Section -->
-                <ul class="vow-list">
-                    <li class="vow-item reveal">
-                        <div class="vow-icon"><i class="fas fa-hand-holding-heart"></i></div>
-                        <div style="font-size: 1.1rem; color: var(--text-dim);">Si alguna vez dudas de ti, quiero ser la voz que te recuerde tu valor.</div>
-                    </li>
-                    <li class="vow-item reveal">
-                        <div class="vow-icon"><i class="fas fa-shield-alt"></i></div>
-                        <div style="font-size: 1.1rem; color: var(--text-dim);">Si alguna vez sientes miedo, quiero ser tu calma.</div>
-                    </li>
-                    <li class="vow-item reveal">
-                        <div class="vow-icon"><i class="fas fa-compass"></i></div>
-                        <div style="font-size: 1.1rem; color: var(--text-dim);">Si alguna vez el camino se vuelve incierto, quiero caminarlo contigo.</div>
-                    </li>
-                </ul>
-
-                <div class="letter-block reveal">
-                    <div class="letter-content">
-                        Quiero aprender contigo. Aprender de tus ideas, de tus experiencias, de tu manera de pensar. Quiero que crezcamos juntos, que maduremos sin perder la ilusión, que construyamos algo fuerte, algo real, algo que no se rinda fácil.
-                    </div>
-                </div>
-
-                <div class="letter-block reveal special">
-                    <div class="letter-content">
-                        Quiero viajar contigo, aunque sea a lugares pequeños. Quiero caminar de tu mano sin importar el destino. Quiero quedarme hablando contigo hasta tarde, reírnos sin razón, hacer planes locos y también planes serios. Quiero abrazarte cuando estés feliz y abrazarte más fuerte cuando estés triste. Quiero estar en tus días buenos y en los difíciles, porque amarte no es solo disfrutar lo bonito, es quedarme también cuando cueste.
-                    </div>
-                </div>
-
-                <div class="letter-block reveal">
-                    <div class="letter-content">
-                        Eres mi pensamiento constante, mi sonrisa inesperada, mi motivación silenciosa. Eres esa persona que llegó y sin darse cuenta cambió mi manera de ver el amor. Porque contigo entendí que amar no es solo sentir mariposas, es elegir, cuidar, respetar, apoyar, construir.
-                    </div>
-                </div>
-
-                <!-- Commit History -->
-                <div class="git-timeline">
-                    <div class="commit reveal">
-                        <div class="commit-box">
-                            <div style="font-family: var(--f-mono); font-size: 12px; color: var(--pink); margin-bottom: 10px;">commit 4f8s9e - "Eternal Foundation"</div>
-                            <div style="color: var(--text-dim);">Quiero construir contigo algo que dure. Algo que no se base solo en palabras bonitas, sino en acciones, en compromiso, en paciencia.</div>
+                <!-- DASHBOARD INTERMEDIO -->
+                <div class="dashboard-grid">
+                    <div class="dash-card reveal">
+                        <h3>Relationship_Stats</h3>
+                        <div style="font-family: 'Fira Code'; font-size: 13px; line-height: 2;">
+                            <span class="cyan">> Thoughts_RAM:</span> 99.9% YOU<br>
+                            <span class="cyan">> Latency:</span> 0ms (In sync)<br>
+                            <span class="cyan">> Future_Path:</span> Clear & Bright
                         </div>
                     </div>
-                    <div class="commit reveal">
-                        <div class="commit-box" style="border-color: var(--cyan);">
-                            <div style="font-family: var(--f-mono); font-size: 12px; color: var(--cyan); margin-bottom: 10px;">commit 2z5v1w - "Daily Choice"</div>
-                            <div style="color: var(--text-dim);">Quiero elegirte cada día, incluso cuando no sea perfecto, incluso cuando haya diferencias, porque lo que siento por ti vale cualquier esfuerzo.</div>
+                    <div class="dash-card reveal">
+                        <h3>Emotions_Barometer</h3>
+                        <div style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 15px 0;">
+                            <div style="width: 100%; height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green)); border-radius: 10px;"></div>
                         </div>
+                        <p style="font-size: 12px; color: var(--text-dim);">Happiness level: OPTIMAL</p>
                     </div>
                 </div>
 
-                <div class="letter-block reveal">
-                    <div class="letter-content" style="text-align: center; border: none; padding: 0;">
-                        <strong style="color: var(--pink); font-size: 1.8rem; display: block; margin-bottom: 30px;">Gracias por existir.</strong>
-                        Gracias por tu forma tan auténtica de ser. Gracias por hacerme sentir este amor que me inspira, que me da esperanza, que me hace querer ser mejor persona.
-                    </div>
+                <!-- BLOQUE 4 -->
+                <div class="msg-block reveal">
+                    <p>Me haces sentir feliz de una manera tan pura que a veces me sorprende. Es una felicidad que no grita, pero que se queda. Me haces sentir seguro, tranquilo, confiado. Contigo puedo ser yo mismo sin miedo a no ser suficiente. Y eso es algo que valoro más de lo que imaginas.</p>
                 </div>
 
-            </section>
+                <!-- BLOQUE 5 -->
+                <div class="msg-block reveal" style="border-left-color: var(--accent-gold);">
+                    <div class="code-piropo">status: Profundamente enamorado</div>
+                    <p>Me tienes enamorado… profundamente enamorado. Enamorado de tu esencia, de tu forma tan única de ser. De tu manera de ver el mundo, de tus sueños, de tus metas. Me enamora tu sonrisa, tu mirada, tu voz, tus gestos pequeños que tal vez tú ni notas pero que yo guardo como tesoros. Me enamora tu corazón, tu sensibilidad, tu fuerza. Me enamora que seas tú.</p>
+                </div>
+
+                <!-- BLOQUE 6 -->
+                <div class="msg-block reveal">
+                    <p>Quiero pasar mucho tiempo a tu lado. No solo días bonitos, sino etapas completas. Quiero vivir procesos contigo, crecer juntos, enfrentar retos y superarlos tomados de la mano. Quiero cumplir nuestras promesas, crear nuevas, soñar en grande y trabajar para que esos sueños se vuelvan realidad.</p>
+                </div>
+
+                <!-- BLOQUE 7 -->
+                <div class="msg-block reveal">
+                    <p>Quiero verte lograr todo lo que te propongas. Quiero estar ahí cuando cumplas tus metas, cuando dudes de ti para recordarte lo increíble que eres, cuando necesites apoyo o simplemente alguien que te escuche. Quiero ser tu refugio cuando el mundo se sienta pesado y tu celebración cuando el mundo te sonría.</p>
+                </div>
+
+                <div class="special-quote scroll-reveal">Eres mi refugio.</div>
+
+                <!-- BLOQUE 8 -->
+                <div class="msg-block reveal">
+                    <p>Quiero aprender contigo. Aprender de tus ideas, de tus experiencias, de tu manera de pensar. Quiero que crezcamos juntos, que maduremos sin perder la ilusión, que construyamos algo fuerte, algo real, algo que no se rinda fácil.</p>
+                </div>
+
+                <!-- BLOQUE 9 -->
+                <div class="msg-block reveal">
+                    <p>Quiero viajar contigo, aunque sea a lugares pequeños. Quiero caminar de tu mano sin importar el destino. Quiero quedarme hablando contigo hasta tarde, reírnos sin razón, hacer planes locos y también planes serios. Quiero abrazarte cuando estés feliz y abrazarte más fuerte cuando estés triste. Quiero estar en tus días buenos y en los difíciles, porque amarte no es solo disfrutar lo bonito, es quedarme también cuando cueste.</p>
+                </div>
+
+                <!-- LISTA DE PROMESAS -->
+                <div class="dash-card reveal" style="margin: 60px 0; border: 1px dashed var(--accent-cyan);">
+                    <div class="git-commit"><p>Si alguna vez dudas de ti, quiero ser la voz que te recuerde tu valor.</p></div>
+                    <div class="git-commit" style="margin-top: 25px;"><p>Si alguna vez sientes miedo, quiero ser tu calma.</p></div>
+                    <div class="git-commit" style="margin-top: 25px;"><p>Si alguna vez el camino se vuelve incierto, quiero caminarlo contigo.</p></div>
+                </div>
+
+                <!-- BLOQUE 10 -->
+                <div class="msg-block reveal">
+                    <p>Eres mi pensamiento constante, mi sonrisa inesperada, mi motivación silenciosa. Eres esa persona que llegó y sin darse cuenta cambió mi manera de ver el amor. Porque contigo entendí que amar no es solo sentir mariposas, es elegir, cuidar, respetar, apoyar, construir.</p>
+                </div>
+
+                <!-- BLOQUE 11 -->
+                <div class="msg-block reveal">
+                    <p>Quiero construir contigo algo que dure. Algo que no se base solo en palabras bonitas, sino en acciones, en compromiso, en paciencia. Quiero elegirte cada día, incluso cuando no sea perfecto, incluso cuando haya diferencias, porque lo que siento por ti vale cualquier esfuerzo.</p>
+                </div>
+
+                <!-- BLOQUE FINAL -->
+                <div class="msg-block reveal" style="border: 2px solid var(--accent-pink); background: rgba(255, 45, 85, 0.05);">
+                    <p style="font-weight: 700; color: #fff; text-align: center;">Gracias por existir. Gracias por tu forma tan auténtica de ser. Gracias por hacerme sentir este amor que me inspira, que me da esperanza, que me hace querer ser mejor persona.</p>
+                    <div class="code-piropo" style="text-align: center; margin-top: 20px;">git commit -m "Mi corazón para siempre"</div>
+                </div>
+
+            </main>
 
             <footer>
-                <button class="finalize-btn" onclick="executeFinalProtocol()">DEPLOY_INFINITE_LOVE.EXE</button>
-                <div style="text-align: center; font-family: var(--f-mono); font-size: 10px; color: var(--text-dim); margin-top: 50px; opacity: 0.5;">
-                    -- HEART CORE KERNEL v7.0.5 | SECURED WITH AES-256-LOVE --
-                </div>
+                <button class="finalize-btn" onclick="celebrate()">DEPLOY_ETERNAL_LOVE.EXE</button>
+                <p style="margin-top: 40px; font-family: 'Fira Code'; font-size: 10px; color: #444;">
+                    &copy; 2024 Love_OS_Engine | Optimizado para el alma de ella.
+                </p>
             </footer>
-
-        </div>
-    </div>
-
-    <!-- UI Widgets -->
-    <div id="music-widget">
-        <div class="album-art"><i class="fas fa-heart"></i></div>
-        <div>
-            <div style="font-size: 14px; font-weight: 800; color: #fff;">Nuestra_Sintonía.mp3</div>
-            <div style="font-size: 11px; color: var(--cyan); font-family: var(--f-mono);">Status: Playing Forever</div>
         </div>
     </div>
 
     <script>
-        // --- Secuencia de Booteo Pro (Extensa para llegar a las 1000 líneas) ---
-        const bMsgs = [
-            {t: "> Kernel Heart_OS v7.0.5 initializing...", c: ""},
-            {t: "> Checking core partitions...", c: ""},
-            {t: "> CPU: LoveCore i9 Extreme detected (Unstable levels of affection)", c: "c-c"},
-            {t: "> Memory: 1.0 Yottabyte of thoughts of HER detected", c: "c-c"},
-            {t: "> Sincronizando latidos al 100%...", c: "c-p"},
-            {t: "> Loading module: Afecto_Infinito.sys", c: "c-g"},
-            {t: "> Loading module: Paciencia_Infinita.sys", c: "c-g"},
-            {t: "> Loading module: Risas_Compartidas.sys", c: "c-g"},
-            {t: "> Detectando unidad PINGUINO... [ONLINE]", c: "c-c"},
-            {t: "> Detectando unidad TORTUGA... [ONLINE]", c: "c-g"},
-            {t: "> Verificando integridad emocional...", c: ""},
-            {t: "> Error 404: 'Tristeza' no encontrada en el sistema.", c: "c-p"},
-            {t: "> Estableciendo conexión segura (NeuralLink Heart2Heart)...", c: "c-c"},
-            {t: "> Protocolo 'Valentine_Day_2024' activado.", c: "c-p"},
-            {t: "> Recompilando recuerdos en HD...", c: ""},
-            {t: "> Preparando interfaz de amor absoluto...", c: ""},
-            {t: "> [SUCCESS] System is stable and ready for deployment.", c: "c-g"},
-            {t: "> Lanzando Heart_GUI...", c: "c-c"}
+        // --- Reproductor de Audio ---
+        const song = document.getElementById('love-song');
+        const playIcon = document.getElementById('play-icon');
+        const musicUI = document.getElementById('music-player-ui');
+        let isPlaying = false;
+
+        function togglePlay() {
+            if (isPlaying) {
+                song.pause();
+                playIcon.className = "fas fa-play";
+                document.getElementById('visualizer-container').innerHTML = '<i class="fas fa-compact-disc fa-spin"></i>';
+            } else {
+                song.play();
+                playIcon.className = "fas fa-pause";
+                musicUI.classList.add('active');
+                addWaveEffect();
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function addWaveEffect() {
+            const container = document.getElementById('visualizer-container');
+            container.innerHTML = '<div style="display:flex; gap:3px; align-items:center;"><div class="wave-bar"></div><div class="wave-bar" style="animation-delay:0.2s"></div><div class="wave-bar" style="animation-delay:0.4s"></div></div>';
+        }
+
+        // --- Secuencia de Booteo ---
+        const bootMsgs = [
+            {t: "> Inicializando Heart_OS v8.0...", c: ""},
+            {t: "> Cargando módulo: Amapolas_Engine...", c: "cyan"},
+            {t: "> Sincronizando latidos...", c: "pink"},
+            {t: "> Cargando unidades: PINGUINO & TORTUGA...", c: "green"},
+            {t: "> Bypass Firewall: Tristeza_v2.0 [OK]", c: "pink"},
+            {t: "> Localizando repositorio de amor infinito...", c: "cyan"},
+            {t: "> Compilando sentimientos...", c: ""},
+            {t: "> Sistema listo. Te amo.", c: "green"}
         ];
 
         const bootScreen = document.getElementById('boot-screen');
-        let bIdx = 0;
+        let bootIdx = 0;
 
         function runBoot() {
-            if (bIdx < bMsgs.length) {
+            if (bootIdx < bootMsgs.length) {
                 const p = document.createElement('div');
-                p.className = `boot-line ${bMsgs[bIdx].c}`;
-                p.innerHTML = bMsgs[bIdx].t;
+                p.className = `boot-line ${bootMsgs[bootIdx].c}`;
+                p.innerHTML = bootMsgs[bootIdx].t;
                 bootScreen.appendChild(p);
                 gsap.to(p, {opacity: 1, duration: 0.1});
-                bootScreen.scrollTop = bootScreen.scrollHeight;
-                bIdx++;
-                setTimeout(runBoot, Math.random() * 150 + 50);
+                bootIdx++;
+                setTimeout(runBoot, 200);
             } else {
                 setTimeout(() => {
                     gsap.to(bootScreen, {
-                        y: "-100%", duration: 1.5, ease: "expo.inOut",
+                        y: "-100%", duration: 1.5, ease: "power4.inOut",
                         onComplete: () => {
                             bootScreen.remove();
-                            initMainExperience();
+                            initApp();
                         }
                     });
                 }, 1000);
@@ -725,90 +378,87 @@
         }
         runBoot();
 
-        // --- Estrellas de Fondo ---
-        const starCanvas = document.getElementById('star-canvas');
-        const sCtx = starCanvas.getContext('2d');
-        starCanvas.width = window.innerWidth;
-        starCanvas.height = window.innerHeight;
-        const stars = [];
-        for(let i=0; i<150; i++) stars.push({x:Math.random()*starCanvas.width, y:Math.random()*starCanvas.height, r:Math.random()*1.5, s:Math.random()*0.02});
+        // --- Pétalos de Amapolas ---
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.innerHTML = '❀';
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.animationDuration = Math.random() * 3 + 2 + 's';
+            petal.style.opacity = Math.random();
+            document.body.appendChild(petal);
+            gsap.to(petal, {
+                y: window.innerHeight + 100,
+                x: '+=100',
+                rotation: 360,
+                duration: 5,
+                ease: "none",
+                onComplete: () => petal.remove()
+            });
+        }
+        setInterval(createPetal, 300);
 
+        // --- Inicialización de App ---
+        function initApp() {
+            document.getElementById('main-content').style.opacity = 1;
+            document.getElementById('main-content').style.pointerEvents = "all";
+            
+            // Mostrar UI de música después de un momento
+            setTimeout(() => musicUI.classList.add('active'), 1000);
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Revelación de Bloques
+            gsap.utils.toArray('.reveal').forEach(el => {
+                gsap.to(el, {
+                    scrollTrigger: { trigger: el, start: "top 85%" },
+                    opacity: 1, x: 0, duration: 1.2
+                });
+            });
+
+            // Revelación de Frases Especiales
+            gsap.utils.toArray('.scroll-reveal').forEach(el => {
+                gsap.to(el, {
+                    scrollTrigger: { trigger: el, start: "top 80%" },
+                    opacity: 1, scale: 1, duration: 2, ease: "elastic.out(1, 0.3)"
+                });
+            });
+        }
+
+        // --- Estrellas de Fondo ---
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const stars = [];
+        for(let i=0; i<100; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5});
         function drawStars() {
-            sCtx.clearRect(0,0,starCanvas.width, starCanvas.height);
-            sCtx.fillStyle = "#fff";
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = "#fff";
             stars.forEach(s => {
-                sCtx.beginPath(); sCtx.arc(s.x, s.y, s.r, 0, Math.PI*2); sCtx.fill();
-                s.y += s.s; if(s.y > starCanvas.height) s.y = 0;
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+                s.y += 0.2; if(s.y > canvas.height) s.y = 0;
             });
             requestAnimationFrame(drawStars);
         }
         drawStars();
 
-        // --- Matrix Overlay ---
-        const matrixDiv = document.getElementById('matrix-overlay');
-        const codes = "010101❤️LOVEPINGUINOTORTUGA01";
-        setInterval(() => {
-            let line = ""; for(let i=0; i<20; i++) line += codes.charAt(Math.floor(Math.random()*codes.length)) + " ";
-            const d = document.createElement('div'); d.innerText = line;
-            d.style.position = "fixed"; d.style.left = Math.random()*100 + "vw"; d.style.top = "-20px";
-            matrixDiv.appendChild(d);
-            gsap.to(d, {y: window.innerHeight + 100, duration: 10, ease: "none", onComplete: () => d.remove()});
-        }, 150);
-
-        // --- Custom Mouse Trailing ---
-        const trail = document.getElementById('mouse-trail');
-        document.addEventListener('mousemove', e => {
-            gsap.to(trail, {x: e.clientX, y: e.clientY, duration: 0.15});
-        });
-
-        // --- GSAP Scroll Logic ---
-        function initMainExperience() {
-            document.getElementById('main-content').style.opacity = 1;
-            document.getElementById('main-content').style.pointerEvents = "all";
-            gsap.registerPlugin(ScrollTrigger);
-
-            // Scroll Progress
-            window.addEventListener('scroll', () => {
-                const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-                document.getElementById('scroll-bar').style.width = scrolled + "%";
-            });
-
-            // Reveals
-            gsap.utils.toArray('.reveal').forEach(el => {
-                gsap.from(el, {
-                    scrollTrigger: { trigger: el, start: "top 85%" },
-                    y: 60, opacity: 0, duration: 1.2, ease: "power3.out"
-                });
-                el.classList.add('reveal');
-            });
-
-            // Dashboard Bars
-            gsap.to('.progress-fill', {
-                scrollTrigger: { trigger: '.dashboard' },
-                width: "100%", duration: 3, stagger: 0.4
-            });
-
-            // Special Letter Animation
-            gsap.from('.dancing-callout', {
-                scrollTrigger: { trigger: '.dancing-callout', start: "top 80%" },
-                scale: 0.5, opacity: 0, rotation: -10, duration: 2, ease: "elastic.out(1, 0.4)"
-            });
-        }
-
-        // --- Protocolo Final (Celebración) ---
-        function executeFinalProtocol() {
-            const end = Date.now() + (15 * 1000);
-            const colors = ['#00f2ff', '#ff2d55', '#39ff14', '#bc13fe'];
-
-            (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
-                if (Date.now() < end) requestAnimationFrame(frame);
-            }());
+        // --- Celebración Final ---
+        function celebrate() {
+            const count = 200;
+            const defaults = { origin: { y: 0.7 } };
+            function fire(particleRatio, opts) {
+                confetti({...defaults, ...opts, particleCount: Math.floor(count * particleRatio)});
+            }
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
 
             setTimeout(() => {
-                alert("SISTEMA: Protocolo 'Amor_Eterno' ejecutado con éxito.\nNo hay errores posibles en lo que siento por ti. ❤️");
-            }, 1000);
+                alert("EJECUCIÓN COMPLETADA:\nHas instalado 'Amor_Eterno' en mi núcleo central.\nTe amo para siempre. ❤️");
+            }, 800);
         }
     </script>
 </body>
