@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heart_OS_v6.0_Final_Build.exe</title>
+    <title>Heart_OS_v7.0_Stable_Build.exe</title>
     
-    <!-- Librerías de Alto Rendimiento -->
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- Recursos de Alta Gama -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Dancing+Script:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -14,101 +14,96 @@
 
     <style>
         :root {
-            --bg: #010204;
-            --surface: #0a0c10;
-            --accent-cyan: #00f2ff;
-            --accent-pink: #ff2d55;
-            --accent-green: #39ff14;
-            --accent-purple: #bc13fe;
-            --glass: rgba(15, 20, 30, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
+            --bg-deep: #020306;
+            --surface-low: #080a0f;
+            --surface-mid: #0f121a;
+            --cyan: #00f2ff;
+            --pink: #ff2d55;
+            --green: #39ff14;
+            --purple: #bc13fe;
+            --glass: rgba(15, 20, 30, 0.75);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f1f5f9;
             --text-dim: #94a3b8;
-            --font-mono: 'Fira Code', monospace;
-            --font-sans: 'Plus Jakarta Sans', sans-serif;
-            --glow-cyan: 0 0 20px rgba(0, 242, 255, 0.3);
-            --glow-pink: 0 0 20px rgba(255, 45, 85, 0.3);
+            --f-mono: 'Fira Code', monospace;
+            --f-sans: 'Plus Jakarta Sans', sans-serif;
+            --f-special: 'Dancing Script', cursive;
         }
 
-        /* --- Estilos Globales & Reset --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        /* --- Reset & Layout Base --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
         
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: var(--font-sans);
+            background-color: var(--bg-deep);
+            color: var(--text);
+            font-family: var(--f-sans);
             overflow-x: hidden;
             scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* --- Barra de Progreso Superior --- */
-        #scroll-progress {
+        /* --- Global Background Elements --- */
+        #star-canvas {
             position: fixed;
-            top: 0; left: 0;
-            width: 0%;
-            height: 3px;
-            background: linear-gradient(to right, var(--accent-cyan), var(--accent-pink), var(--accent-purple));
-            z-index: 10000;
-            transition: width 0.1s;
+            top: 0; left: 0; z-index: -1;
+            opacity: 0.4;
         }
 
-        /* --- Boot Sequence / Loader --- */
+        #matrix-overlay {
+            position: fixed;
+            top: 0; left: 0; z-index: -1;
+            opacity: 0.1;
+            font-family: var(--f-mono);
+            font-size: 10px;
+            pointer-events: none;
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.9) 100%);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* --- Custom UI Components --- */
+        #scroll-bar {
+            position: fixed;
+            top: 0; left: 0; width: 0%; height: 4px;
+            background: linear-gradient(90deg, var(--cyan), var(--pink), var(--purple));
+            z-index: 2000;
+            box-shadow: 0 0 15px var(--pink);
+        }
+
+        #mouse-trail {
+            width: 25px; height: 25px;
+            border: 1px solid var(--cyan);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out, background 0.3s;
+            box-shadow: 0 0 15px var(--cyan);
+        }
+
+        /* --- Loader / Boot Sequence (PRO) --- */
         #boot-screen {
             position: fixed;
             inset: 0;
             background: #000;
             z-index: 99999;
-            padding: 40px;
-            font-family: var(--font-mono);
+            padding: 50px;
+            font-family: var(--f-mono);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
-        .boot-line { font-size: 13px; line-height: 1.6; margin-bottom: 2px; opacity: 0; color: #fff; }
-        .c-cyan { color: var(--accent-cyan); }
-        .c-pink { color: var(--accent-pink); }
-        .c-green { color: var(--accent-green); }
-        .c-purple { color: var(--accent-purple); }
-
-        /* --- Background Matrix Canvas --- */
-        #matrix-bg {
-            position: fixed;
-            top: 0; left: 0; z-index: -1;
-            opacity: 0.15;
-            filter: blur(0.5px);
-        }
-
-        .vignette-overlay {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.9) 100%);
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        /* --- Custom Cursor --- */
-        #custom-cursor {
-            width: 20px; height: 20px;
-            background: rgba(0, 242, 255, 0.2);
-            border: 1px solid var(--accent-cyan);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 20000;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px var(--accent-cyan);
-            display: none;
-        }
-
-        /* --- UI Wrapper --- */
-        .wrapper {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 30px;
-            position: relative;
-        }
+        .boot-line { font-size: 12px; margin-bottom: 3px; opacity: 0; color: #fff; }
+        .c-c { color: var(--cyan); }
+        .c-p { color: var(--pink); }
+        .c-g { color: var(--green); }
 
         /* --- Header Section --- */
         .hero {
@@ -118,637 +113,702 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            gap: 20px;
-        }
-
-        .sys-badge {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            padding: 6px 18px;
-            border-radius: 100px;
-            background: rgba(0, 242, 255, 0.05);
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            box-shadow: var(--glow-cyan);
-            animation: breathe 4s infinite ease-in-out;
-        }
-
-        .title-container {
             position: relative;
-            margin-bottom: 20px;
+        }
+
+        .badge {
+            font-family: var(--f-mono);
+            font-size: 10px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
         }
 
         .main-title {
-            font-size: clamp(3rem, 15vw, 8rem);
+            font-size: clamp(3rem, 18vw, 9rem);
             font-weight: 800;
-            letter-spacing: -6px;
-            line-height: 0.85;
-            background: linear-gradient(180deg, #fff 0%, var(--accent-pink) 100%);
+            letter-spacing: -8px;
+            line-height: 0.8;
+            background: linear-gradient(180deg, #fff 0%, var(--pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
-        }
-
-        /* --- Biometric Image Vault --- */
-        .bio-vault {
-            display: flex;
-            gap: 40px;
-            margin: 80px 0;
-            width: 100%;
-            justify-content: center;
-            perspective: 2000px;
-        }
-
-        .vault-card {
-            width: 320px;
-            height: 440px;
-            background: var(--surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            position: relative;
-            overflow: hidden;
-            transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            backdrop-filter: blur(15px);
-        }
-
-        .vault-card:hover {
-            transform: translateY(-20px) rotateX(10deg);
-            border-color: var(--theme-color);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 30px var(--theme-glow);
-        }
-
-        .vault-img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            opacity: 0.7;
-            transition: 0.6s;
-            filter: grayscale(0.4) brightness(0.8);
-        }
-
-        .vault-card:hover .vault-img {
-            opacity: 1; filter: grayscale(0) brightness(1);
-            transform: scale(1.05);
-        }
-
-        .scan-laser {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 2px;
-            background: var(--theme-color);
-            box-shadow: 0 0 15px var(--theme-color);
-            animation: scanning 4s infinite linear;
-            z-index: 10;
-        }
-
-        @keyframes scanning { 0% { top: -5%; } 100% { top: 105%; } }
-
-        .vault-meta {
-            position: absolute;
-            bottom: 25px; left: 25px; right: 25px;
-            background: rgba(0,0,0,0.85);
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 4px solid var(--theme-color);
-            font-family: var(--font-mono);
-            font-size: 11px;
-            z-index: 15;
-            backdrop-filter: blur(5px);
-        }
-
-        /* --- Interactive Love Dashboard --- */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin: 100px 0;
-        }
-
-        .dash-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dash-card h3 {
-            font-family: var(--font-mono);
-            font-size: 14px;
-            color: var(--accent-cyan);
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        .stat-flex {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .stat-label { font-size: 12px; color: var(--text-dim); }
-        .stat-value { font-family: var(--font-mono); font-weight: 700; color: var(--accent-green); }
-
-        .health-bar-container {
-            width: 100%; height: 6px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .health-bar-fill {
-            height: 100%;
-            background: linear-gradient(to right, var(--accent-cyan), var(--accent-green));
-            width: 0%;
-            transition: width 2s cubic-bezier(0.1, 0, 0.2, 1);
-        }
-
-        /* --- Technical Love Docs --- */
-        .docs-section {
-            background: var(--surface);
-            border-radius: 30px;
-            padding: 60px;
-            margin: 100px 0;
-            border: 1px solid #1a1e26;
-        }
-
-        .docs-header {
-            border-bottom: 1px solid #1a1e26;
-            padding-bottom: 30px;
             margin-bottom: 40px;
         }
 
-        .method-tag {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            background: var(--accent-pink);
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 4px;
-            margin-right: 10px;
+        /* --- Biometric Image Cards --- */
+        .vault-container {
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            width: 100%;
+            margin-top: 50px;
+            perspective: 1500px;
         }
 
-        .doc-paragraph {
-            font-size: 1.15rem;
-            line-height: 1.9;
-            color: var(--text-dim);
-            margin-bottom: 30px;
-            text-align: justify;
-        }
-
-        /* --- GitHub Style Commits --- */
-        .commit-log {
-            margin: 100px 0;
-            padding-left: 30px;
-            border-left: 2px solid #1a1e26;
-        }
-
-        .commit-item {
+        .biometric-card {
+            width: 320px;
+            height: 450px;
+            background: var(--surface-low);
+            border: 1px solid var(--border);
+            border-radius: 25px;
             position: relative;
-            padding-bottom: 50px;
+            overflow: hidden;
+            transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+            backdrop-filter: blur(20px);
         }
 
-        .commit-item::before {
-            content: '';
+        .biometric-card:hover {
+            transform: translateY(-25px) rotateX(8deg) rotateY(-5deg);
+            border-color: var(--theme-color);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 30px var(--theme-glow);
+        }
+
+        .bio-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+            transition: 0.6s;
+            filter: saturate(0.5);
+        }
+
+        .biometric-card:hover .bio-img {
+            opacity: 1; filter: saturate(1.2); transform: scale(1.1);
+        }
+
+        .laser-scanner {
             position: absolute;
-            left: -36px; top: 0;
-            width: 10px; height: 10px;
-            background: var(--accent-green);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-green);
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--theme-color);
+            box-shadow: 0 0 20px var(--theme-color);
+            animation: scanning 3.5s infinite ease-in-out;
+            z-index: 10;
         }
 
-        .commit-card {
+        @keyframes scanning { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+
+        .bio-data {
+            position: absolute;
+            bottom: 30px; left: 30px; right: 30px;
+            background: rgba(0,0,0,0.85);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid var(--theme-color);
+            font-family: var(--f-mono);
+            font-size: 11px;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+        }
+
+        /* --- Dashboard Sections --- */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin: 150px 0;
+        }
+
+        .dash-widget {
+            background: var(--surface-mid);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .widget-header {
+            font-family: var(--f-mono);
+            font-size: 12px;
+            color: var(--cyan);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .stat-label { color: var(--text-dim); }
+        .stat-val { font-weight: 700; color: var(--green); font-family: var(--f-mono); }
+
+        .progress-container {
+            width: 100%; height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin: 10px 0 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--green));
+            width: 0%;
+            transition: 3s cubic-bezier(0.1, 0, 0.2, 1);
+        }
+
+        /* --- The Great Letter Section --- */
+        .letter-container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .letter-block {
+            margin-bottom: 120px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .letter-block.reveal { opacity: 1; transform: translateY(0); }
+
+        .letter-content {
+            font-size: 1.4rem;
+            line-height: 2.1;
+            color: var(--text-dim);
+            position: relative;
+            padding-left: 40px;
+            border-left: 2px solid var(--border);
+        }
+
+        .letter-content strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .letter-block.special .letter-content {
+            border-left: 3px solid var(--pink);
+            background: linear-gradient(90deg, rgba(255, 45, 85, 0.05) 0%, transparent 100%);
+            padding: 40px;
+            border-radius: 0 30px 30px 0;
+        }
+
+        .dancing-callout {
+            font-family: var(--f-special);
+            font-size: clamp(3.5rem, 8vw, 7rem);
+            color: var(--pink);
+            text-align: center;
+            margin: 100px 0;
+            text-shadow: 0 0 40px rgba(255, 45, 85, 0.4);
+            filter: drop-shadow(0 0 10px var(--pink));
+        }
+
+        /* --- Valentine API Documentation --- */
+        .api-docs {
             background: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 50px;
+            font-family: var(--f-mono);
+            margin: 150px 0;
         }
 
-        .commit-card .title { font-family: var(--font-mono); font-size: 14px; color: #fff; margin-bottom: 8px; }
-        .commit-card .desc { font-size: 13px; color: var(--text-dim); }
+        .api-tag {
+            background: var(--green);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 12px;
+            margin-right: 15px;
+        }
 
-        /* --- Heartbeat Visualizer --- */
-        .visualizer {
+        .api-endpoint { color: var(--cyan); font-size: 14px; }
+
+        .code-window {
+            background: #000;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            border: 1px solid #222;
+            color: #7ee787;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* --- Interactive List Section --- */
+        .vow-list {
+            margin: 100px 0;
+            list-style: none;
+        }
+
+        .vow-item {
+            padding: 30px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            margin-bottom: 20px;
             display: flex;
-            align-items: flex-end;
-            gap: 4px;
-            height: 40px;
-            margin-top: 20px;
+            align-items: center;
+            gap: 25px;
+            transition: 0.4s;
         }
 
-        .vis-bar {
-            width: 4px;
-            background: var(--accent-pink);
-            border-radius: 2px;
-            animation: pulse-bar 1s infinite alternate;
+        .vow-item:hover {
+            border-color: var(--pink);
+            transform: translateX(20px);
+            background: rgba(255, 45, 85, 0.05);
         }
 
-        @keyframes pulse-bar { 0% { height: 10%; } 100% { height: 100%; } }
-
-        /* --- Message Spotlight --- */
-        .spotlight-text {
-            font-family: 'Dancing Script', cursive;
-            font-size: clamp(3rem, 10vw, 7rem);
-            text-align: center;
-            margin: 120px 0;
-            color: var(--accent-pink);
-            text-shadow: 0 0 40px rgba(255, 45, 85, 0.5);
-            opacity: 0;
-            transform: scale(0.8);
+        .vow-icon {
+            width: 50px; height: 50px;
+            background: rgba(255, 45, 85, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--pink);
+            font-size: 20px;
         }
 
-        /* --- Audio Player UI --- */
-        .player-floating {
+        /* --- Timeline of Commits --- */
+        .git-timeline {
+            position: relative;
+            padding-left: 50px;
+            margin: 150px 0;
+        }
+
+        .git-timeline::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 2px; background: #1b1f23;
+        }
+
+        .commit {
+            position: relative;
+            margin-bottom: 60px;
+        }
+
+        .commit::before {
+            content: ''; position: absolute; left: -56px; top: 10px;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--green); box-shadow: 0 0 15px var(--green);
+        }
+
+        .commit-box {
+            background: var(--surface-low);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+
+        /* --- Footer Floating Audio --- */
+        #music-widget {
             position: fixed;
             bottom: 40px; right: 40px;
             width: 320px;
             background: var(--glass);
-            backdrop-filter: blur(25px);
+            backdrop-filter: blur(30px);
             border: 1px solid var(--glass-border);
             padding: 20px;
-            border-radius: 24px;
+            border-radius: 25px;
             z-index: 5000;
             display: flex;
             align-items: center;
-            gap: 15px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            gap: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
         }
 
         .album-art {
             width: 60px; height: 60px;
-            border-radius: 12px;
-            background: linear-gradient(45deg, var(--accent-pink), var(--accent-purple));
+            border-radius: 15px;
+            background: linear-gradient(45deg, var(--pink), var(--purple));
             display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: #fff;
-            animation: spinning 8s infinite linear;
+            font-size: 28px; color: #fff;
+            animation: rotateHeart 10s infinite linear;
         }
 
-        @keyframes spinning { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes rotateHeart { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- Footer Button --- */
-        footer {
-            padding: 150px 0 100px;
-            text-align: center;
-        }
-
-        .mega-button {
+        /* --- Final Button --- */
+        .finalize-btn {
             background: transparent;
-            border: 2px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            padding: 25px 60px;
-            font-family: var(--font-mono);
+            border: 2px solid var(--cyan);
+            color: var(--cyan);
+            padding: 30px 80px;
+            font-family: var(--f-mono);
             font-weight: 700;
-            font-size: 14px;
-            letter-spacing: 4px;
+            font-size: 16px;
+            letter-spacing: 5px;
             border-radius: 100px;
             cursor: pointer;
-            transition: 0.5s cubic-bezier(0.2, 0, 0.2, 1);
+            transition: 0.5s;
             position: relative;
             overflow: hidden;
+            display: block;
+            margin: 100px auto;
         }
 
-        .mega-button:hover {
-            background: var(--accent-cyan);
+        .finalize-btn:hover {
+            background: var(--cyan);
             color: #000;
-            box-shadow: 0 0 50px var(--accent-cyan);
-            transform: translateY(-5px);
+            box-shadow: 0 0 60px var(--cyan);
+            transform: scale(1.05);
         }
 
-        .mega-button::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: rotate(45deg); transition: 0.5s;
-        }
-
-        .mega-button:hover::after { left: 150%; }
-
-        /* --- Animations --- */
-        @keyframes breathe {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
-        }
-
-        /* --- Responsive --- */
+        /* --- Mobile Optimization --- */
         @media (max-width: 768px) {
-            .bio-vault { flex-direction: column; align-items: center; }
-            .docs-section { padding: 30px; }
+            .vault-container { flex-direction: column; align-items: center; }
             .dashboard { grid-template-columns: 1fr; }
-            .player-floating { display: none; }
-            .main-title { font-size: 3.5rem; letter-spacing: -2px; }
+            .letter-content { font-size: 1.1rem; line-height: 1.8; padding-left: 20px; }
+            .main-title { font-size: 3.5rem; letter-spacing: -3px; }
+            #music-widget { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div id="scroll-progress"></div>
-    <div id="custom-cursor"></div>
+    <div id="scroll-bar"></div>
+    <div id="mouse-trail"></div>
     <div id="boot-screen"></div>
-    <canvas id="matrix-bg"></canvas>
-    <div class="vignette-overlay"></div>
+    <div id="matrix-overlay"></div>
+    <canvas id="star-canvas"></canvas>
+    <div class="vignette"></div>
 
     <div id="main-content" style="opacity: 0; pointer-events: none;">
         
-        <div class="wrapper">
+        <div class="wrapper" style="max-width: 1300px; margin: 0 auto; padding: 0 40px;">
             
-            <!-- Hero Header -->
+            <!-- Hero Section -->
             <header class="hero">
-                <div class="sys-badge" data-gsap="fade-down">CORE_ESTABLISHED: Feb_14_2024</div>
-                <div class="title-container" data-gsap="zoom-in">
-                    <h1 class="main-title">Heart_OS<br>v6.0</h1>
-                </div>
-                <p style="font-family: var(--font-mono); color: var(--accent-cyan); font-size: 12px;">
-                    // Compiled with 100% devotion | Stabilizing emotions... OK
+                <div class="badge">system_core: activated | Valentine_build_7.0</div>
+                <h1 class="main-title">Heart_OS</h1>
+                <p style="font-family: var(--f-mono); color: var(--cyan); letter-spacing: 2px; font-size: 14px;">
+                    // Connecting to the most special soul in the universe... [CONNECTED]
                 </p>
 
-                <div class="bio-vault">
+                <div class="vault-container">
                     <!-- FOTO PINGÜINO -->
-                    <div class="vault-card" style="--theme-color: #00f2ff; --theme-glow: rgba(0,242,255,0.4);">
-                        <div class="scan-laser"></div>
-                        <img src="pinguino.jpg" alt="Pinguino" class="vault-img">
-                        <div class="vault-meta">
-                            <span class="c-green">[SCAN_COMPLETE]</span> Entity: Pinguino.sys <br>
-                            <span class="c-cyan">Attribute: Protector Eterno</span>
+                    <div class="biometric-card" style="--theme-color: var(--cyan); --theme-glow: rgba(0,242,255,0.4);">
+                        <div class="laser-scanner"></div>
+                        <img src="pinguino.jpg" alt="Pinguino" class="bio-img">
+                        <div class="bio-data">
+                            <span class="c-g">[SUCCESS]</span> Entity: Pinguino.unit <br>
+                            <span class="c-c">Function: Protección Eterna</span>
                         </div>
                     </div>
 
                     <!-- FOTO TORTUGA -->
-                    <div class="vault-card" style="--theme-color: #39ff14; --theme-glow: rgba(57,255,20,0.4);">
-                        <div class="scan-laser"></div>
-                        <img src="tortuga.avif" alt="Tortuga" class="vault-img">
-                        <div class="vault-meta">
-                            <span class="c-green">[SCAN_COMPLETE]</span> Entity: Tortuga.sys <br>
-                            <span class="c-green">Attribute: Calma Infinita</span>
+                    <div class="biometric-card" style="--theme-color: var(--green); --theme-glow: rgba(57,255,20,0.4);">
+                        <div class="laser-scanner"></div>
+                        <img src="tortuga.avif" alt="Tortuga" class="bio-img">
+                        <div class="bio-data">
+                            <span class="c-g">[SUCCESS]</span> Entity: Tortuga.unit <br>
+                            <span class="c-g">Function: Calma Absoluta</span>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Dashboard de Salud Emocional -->
+            <!-- Status Dashboard -->
             <section class="dashboard">
-                <div class="dash-card reveal">
-                    <h3>System_Status</h3>
-                    <div class="stat-flex">
-                        <span class="stat-label">Connection Latency</span>
-                        <span class="stat-value">0.00ms</span>
-                    </div>
-                    <div class="stat-flex">
-                        <span class="stat-label">Heart_Stability</span>
-                        <span class="stat-value">Perfect</span>
-                    </div>
-                    <div class="visualizer">
-                        <div class="vis-bar" style="animation-delay: 0.1s"></div>
-                        <div class="vis-bar" style="animation-delay: 0.3s"></div>
-                        <div class="vis-bar" style="animation-delay: 0.5s"></div>
-                        <div class="vis-bar" style="animation-delay: 0.2s"></div>
-                        <div class="vis-bar" style="animation-delay: 0.4s"></div>
-                        <div class="vis-bar" style="animation-delay: 0.6s"></div>
-                    </div>
+                <div class="dash-widget reveal">
+                    <div class="widget-header"><i class="fas fa-heartbeat"></i> Biometric_Data</div>
+                    <div class="stat-row"><span class="stat-label">Connection_Type</span><span class="stat-val">Soul-to-Soul</span></div>
+                    <div class="stat-row"><span class="stat-label">Heartbeat_Sync</span><span class="stat-val">100%</span></div>
+                    <div class="stat-row"><span class="stat-label">Devotion_Level</span><span class="stat-val">∞</span></div>
                 </div>
 
-                <div class="dash-card reveal">
-                    <h3>Emotions_Barometer</h3>
-                    <div class="stat-flex">
-                        <span class="stat-label">Happiness_Level</span>
-                        <span class="stat-value">100%</span>
-                    </div>
-                    <div class="health-bar-container"><div class="health-bar-fill" style="width: 100%"></div></div>
-                    <div style="margin-top: 15px;" class="stat-flex">
-                        <span class="stat-label">Obsession_Level</span>
-                        <span class="stat-value">Overload</span>
-                    </div>
-                    <div class="health-bar-container"><div class="health-bar-fill" style="width: 100%; background: var(--accent-pink)"></div></div>
+                <div class="dash-widget reveal">
+                    <div class="widget-header"><i class="fas fa-brain"></i> Neural_Status</div>
+                    <div class="stat-row"><span class="stat-label">Happiness_Index</span><span class="stat-val">MAX</span></div>
+                    <div class="progress-container"><div class="progress-fill" style="width: 100%;"></div></div>
+                    <div class="stat-row"><span class="stat-label">Safety_Feeling</span><span class="stat-val">Secure</span></div>
+                    <div class="progress-container"><div class="progress-fill" style="width: 100%; background: var(--purple);"></div></div>
                 </div>
 
-                <div class="dash-card reveal">
-                    <h3>Resource_Usage</h3>
-                    <div class="stat-flex"><span class="stat-label">Thoughts_RAM</span><span class="stat-value">99% YOU</span></div>
-                    <div class="stat-flex"><span class="stat-label">Memory_Storage</span><span class="stat-value">Full of Smiles</span></div>
-                    <div class="stat-flex"><span class="stat-label">Processor</span><span class="stat-value">Heart-Core i9</span></div>
+                <div class="dash-widget reveal">
+                    <div class="widget-header"><i class="fas fa-microchip"></i> Processor_Usage</div>
+                    <div class="stat-row"><span class="stat-label">Thoughts_RAM</span><span class="stat-val">99.9% YOU</span></div>
+                    <div class="stat-row"><span class="stat-label">Storage</span><span class="stat-val">Memories_Full</span></div>
+                    <div class="stat-row"><span class="stat-label">Uptime</span><span class="stat-val">Always Active</span></div>
                 </div>
             </section>
 
-            <!-- Sección de Documentación del Corazón -->
-            <section class="docs-section reveal">
-                <div class="docs-header">
-                    <span class="method-tag">STABLE</span>
-                    <span style="font-family: var(--font-mono); font-size: 14px; color: var(--accent-cyan);">API_Endpoint: /heart/v6/feelings/infinite</span>
-                </div>
+            <!-- The Great Letter (Part 1) -->
+            <section class="letter-container">
                 
-                <p class="doc-paragraph">
-                    Hoy, 14 de febrero, he decidido abrir el código fuente de lo que siento. No es un simple mensaje, es una compilación de cada latido, cada risa compartida y cada momento en el que simplemente existimos juntos. He configurado mi sistema para que tú seas el usuario root con privilegios totales.
-                </p>
-
-                <p class="doc-paragraph">
-                    Lo que siento por ti no tiene bugs, no tiene fugas de memoria y ciertamente no tiene fin. Te amo no por lo que eres, sino por la paz que inyectas en mi procesador central cada vez que me miras o me hablas. Eres el framework que sostiene mi vida.
-                </p>
-
-                <div style="background: rgba(0,0,0,0.5); padding: 25px; border-radius: 12px; font-family: var(--font-mono); font-size: 13px; color: var(--accent-green); border-left: 3px solid var(--accent-green);">
-                    // sudo apt-get install felicidad_eterna <br>
-                    // Leyendo repositorio del alma... <br>
-                    // Instalando "Tu_Sonrisa_v2.0"... [####################] 100% <br>
-                    // Éxito: Eres el motivo de mi existencia.
-                </div>
-            </section>
-
-            <h2 class="spotlight-text reveal">Te amo con todo mi sistema.</h2>
-
-            <!-- Timeline de Commits -->
-            <section class="commit-log">
-                <div class="commit-item reveal">
-                    <div class="commit-card">
-                        <div class="title">feat: First_Connection.sys</div>
-                        <div class="desc">Inicialización del repositorio del corazón. El día que mi mundo cambió de base de datos.</div>
+                <div class="letter-block reveal special">
+                    <div class="letter-content">
+                        Hoy, 14 de febrero, no quiero regalarte solo palabras… quiero regalarte todo lo que siento cuando pienso en ti. Quiero que este mensaje sea como un abrazo largo, de esos que no tienen prisa, de esos que dicen más que mil frases cortas.
                     </div>
                 </div>
-                <div class="commit-item reveal">
-                    <div class="commit-card">
-                        <div class="title">update: Memory_Upgrade_Patch</div>
-                        <div class="desc">Añadidos miles de recuerdos en alta definición. Optimizando cada risa guardada.</div>
-                    </div>
-                </div>
-                <div class="commit-item reveal">
-                    <div class="commit-card" style="border-color: var(--accent-pink);">
-                        <div class="title" style="color: var(--accent-pink);">fix: Grey_Days_Elimination</div>
-                        <div class="desc">Tu presencia ha parchado permanentemente cualquier rastro de tristeza en el servidor.</div>
-                    </div>
-                </div>
-            </section>
 
-            <!-- Carta Final -->
-            <section class="docs-section reveal" style="border: 2px solid var(--accent-pink); background: rgba(255, 45, 85, 0.02);">
-                <p class="doc-paragraph" style="text-align: center; font-weight: 700; color: #fff;">
-                    Gracias por ser mi lugar favorito. Gracias por ser esa constante en un universo lleno de variables. Gracias por simplemente ser tú, porque para mi sistema operativo, tú eres la única actualización que necesito para siempre.
-                </p>
-                <div style="text-align: center; font-family: var(--font-mono); color: var(--accent-pink); margin-top: 20px;">
-                    &lt;commit message="Mi vida entera para ti" /&gt;
+                <h2 class="dancing-callout reveal">Te amo.</h2>
+
+                <div class="letter-block reveal">
+                    <div class="letter-content">
+                        Y te amo de una forma que no sabía que existía hasta que llegaste tú. No es un amor ligero ni pasajero, es un amor que pesa bonito en el pecho, que se siente firme, que crece con cada recuerdo y con cada momento compartido. Me importas demasiado, más de lo que podría explicarte aunque escribiera mil páginas. Eres alguien esencial en mi vida, alguien que no solo está… sino que significa.
+                    </div>
                 </div>
+
+                <div class="letter-block reveal">
+                    <div class="letter-content">
+                        Me encanta pasar tiempo contigo, en cualquier lugar, haciendo cualquier cosa. No necesito planes perfectos ni escenarios extraordinarios; si estoy contigo, ya lo es todo. Porque tu presencia transforma lo simple en mágico. Una conversación contigo vale más que cualquier distracción. Una risa tuya puede arreglar un día entero. Incluso tus silencios me gustan, porque contigo el silencio no es vacío, es conexión.
+                    </div>
+                </div>
+
+                <div class="letter-block reveal">
+                    <div class="letter-content">
+                        Me haces sentir feliz de una manera tan pura que a veces me sorprende. Es una felicidad que no grita, pero que se queda. Me haces sentir seguro, tranquilo, confiado. Contigo puedo ser yo mismo sin miedo a no ser suficiente. Y eso es algo que valoro más de lo que imaginas.
+                    </div>
+                </div>
+
+                <!-- API Docs Break -->
+                <div class="api-docs reveal">
+                    <div style="display:flex; align-items:center; margin-bottom: 20px;">
+                        <span class="api-tag">POST</span>
+                        <span class="api-endpoint">/heart/v7/feelings/deep_love</span>
+                    </div>
+                    <div class="code-window">
+                        { <br>
+                        &nbsp;&nbsp;"feeling": "Deeply enamorado", <br>
+                        &nbsp;&nbsp;"target": "Tú", <br>
+                        &nbsp;&nbsp;"reason": "Tu esencia única", <br>
+                        &nbsp;&nbsp;"attributes": ["Sonrisa", "Mirada", "Voz", "Gestos"], <br>
+                        &nbsp;&nbsp;"commit": "Para siempre" <br>
+                        }
+                    </div>
+                </div>
+
+                <div class="letter-block reveal">
+                    <div class="letter-content">
+                        Me tienes enamorado… profundamente enamorado. Enamorado de tu esencia, de tu forma tan única de ser. De tu manera de ver el mundo, de tus sueños, de tus metas. Me enamora tu sonrisa, tu mirada, tu voz, tus gestos pequeños que tal vez tú ni notas pero que yo guardo como tesoros. Me enamora tu corazón, tu sensibilidad, tu fuerza. Me enamora que seas tú.
+                    </div>
+                </div>
+
+                <div class="letter-block reveal">
+                    <div class="letter-content">
+                        Quiero pasar mucho tiempo a tu lado. No solo días bonitos, sino etapas completas. Quiero vivir procesos contigo, crecer juntos, enfrentar retos y superarlos tomados de la mano. Quiero cumplir nuestras promesas, crear nuevas, soñar en grande y trabajar para que esos sueños se vuelvan realidad.
+                    </div>
+                </div>
+
+                <div class="letter-block reveal">
+                    <div class="letter-content">
+                        Quiero verte lograr todo lo que te propongas. Quiero estar ahí cuando cumplas tus metas, cuando dudes de ti para recordarte lo increíble que eres, cuando necesites apoyo o simplemente alguien que te escuche. Quiero ser tu refugio cuando el mundo se sienta pesado y tu celebración cuando el mundo te sonría.
+                    </div>
+                </div>
+
+                <!-- Vow List Section -->
+                <ul class="vow-list">
+                    <li class="vow-item reveal">
+                        <div class="vow-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                        <div style="font-size: 1.1rem; color: var(--text-dim);">Si alguna vez dudas de ti, quiero ser la voz que te recuerde tu valor.</div>
+                    </li>
+                    <li class="vow-item reveal">
+                        <div class="vow-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div style="font-size: 1.1rem; color: var(--text-dim);">Si alguna vez sientes miedo, quiero ser tu calma.</div>
+                    </li>
+                    <li class="vow-item reveal">
+                        <div class="vow-icon"><i class="fas fa-compass"></i></div>
+                        <div style="font-size: 1.1rem; color: var(--text-dim);">Si alguna vez el camino se vuelve incierto, quiero caminarlo contigo.</div>
+                    </li>
+                </ul>
+
+                <div class="letter-block reveal">
+                    <div class="letter-content">
+                        Quiero aprender contigo. Aprender de tus ideas, de tus experiencias, de tu manera de pensar. Quiero que crezcamos juntos, que maduremos sin perder la ilusión, que construyamos algo fuerte, algo real, algo que no se rinda fácil.
+                    </div>
+                </div>
+
+                <div class="letter-block reveal special">
+                    <div class="letter-content">
+                        Quiero viajar contigo, aunque sea a lugares pequeños. Quiero caminar de tu mano sin importar el destino. Quiero quedarme hablando contigo hasta tarde, reírnos sin razón, hacer planes locos y también planes serios. Quiero abrazarte cuando estés feliz y abrazarte más fuerte cuando estés triste. Quiero estar en tus días buenos y en los difíciles, porque amarte no es solo disfrutar lo bonito, es quedarme también cuando cueste.
+                    </div>
+                </div>
+
+                <div class="letter-block reveal">
+                    <div class="letter-content">
+                        Eres mi pensamiento constante, mi sonrisa inesperada, mi motivación silenciosa. Eres esa persona que llegó y sin darse cuenta cambió mi manera de ver el amor. Porque contigo entendí que amar no es solo sentir mariposas, es elegir, cuidar, respetar, apoyar, construir.
+                    </div>
+                </div>
+
+                <!-- Commit History -->
+                <div class="git-timeline">
+                    <div class="commit reveal">
+                        <div class="commit-box">
+                            <div style="font-family: var(--f-mono); font-size: 12px; color: var(--pink); margin-bottom: 10px;">commit 4f8s9e - "Eternal Foundation"</div>
+                            <div style="color: var(--text-dim);">Quiero construir contigo algo que dure. Algo que no se base solo en palabras bonitas, sino en acciones, en compromiso, en paciencia.</div>
+                        </div>
+                    </div>
+                    <div class="commit reveal">
+                        <div class="commit-box" style="border-color: var(--cyan);">
+                            <div style="font-family: var(--f-mono); font-size: 12px; color: var(--cyan); margin-bottom: 10px;">commit 2z5v1w - "Daily Choice"</div>
+                            <div style="color: var(--text-dim);">Quiero elegirte cada día, incluso cuando no sea perfecto, incluso cuando haya diferencias, porque lo que siento por ti vale cualquier esfuerzo.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="letter-block reveal">
+                    <div class="letter-content" style="text-align: center; border: none; padding: 0;">
+                        <strong style="color: var(--pink); font-size: 1.8rem; display: block; margin-bottom: 30px;">Gracias por existir.</strong>
+                        Gracias por tu forma tan auténtica de ser. Gracias por hacerme sentir este amor que me inspira, que me da esperanza, que me hace querer ser mejor persona.
+                    </div>
+                </div>
+
             </section>
 
             <footer>
-                <button class="mega-button" onclick="celebrate()">DEPLOY_ETERNAL_LOVE.EXE</button>
-                <p style="margin-top: 50px; font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); opacity: 0.5;">
-                    -- HEART OS KERNEL v6.0.4-LTS | ENCRYPTED WITH PURE LOVE --
-                </p>
+                <button class="finalize-btn" onclick="executeFinalProtocol()">DEPLOY_INFINITE_LOVE.EXE</button>
+                <div style="text-align: center; font-family: var(--f-mono); font-size: 10px; color: var(--text-dim); margin-top: 50px; opacity: 0.5;">
+                    -- HEART CORE KERNEL v7.0.5 | SECURED WITH AES-256-LOVE --
+                </div>
             </footer>
 
         </div>
     </div>
 
-    <!-- Floating Audio UI -->
-    <div class="player-floating">
+    <!-- UI Widgets -->
+    <div id="music-widget">
         <div class="album-art"><i class="fas fa-heart"></i></div>
-        <div style="flex: 1;">
-            <div style="font-size: 13px; font-weight: 800; color: #fff;">Sintonía_Eterna.mp3</div>
-            <div style="font-size: 10px; color: var(--accent-cyan); font-family: var(--font-mono);">00:00 / ∞</div>
+        <div>
+            <div style="font-size: 14px; font-weight: 800; color: #fff;">Nuestra_Sintonía.mp3</div>
+            <div style="font-size: 11px; color: var(--cyan); font-family: var(--f-mono);">Status: Playing Forever</div>
         </div>
-        <i class="fas fa-play" style="color: var(--accent-cyan); cursor: pointer;"></i>
     </div>
 
     <script>
-        // --- Secuencia de Booteo Pro (+100 líneas de lógica) ---
-        const bootMessages = [
-            {t: "> Kernel Heart_OS v6.0.4 loading...", c: ""},
-            {t: "> Checking system integrity...", c: ""},
-            {t: "> CPU: Love-Core i9 detected at 5.0GHz", c: "c-cyan"},
-            {t: "> RAM: 1.0 Petabyte of memories detected", c: "c-cyan"},
-            {t: "> Loading module: Afecto_Incondicional.ko", c: "c-green"},
-            {t: "> Loading module: Paciencia_Infinitum.ko", c: "c-green"},
-            {t: "> Searching for entity: ELLA...", c: "c-purple"},
-            {t: "> [FOUND] Entity located in Heart_Sector_01", c: "c-green"},
-            {t: "> Bypassing firewall: Tristeza_v2.1... [PASSED]", c: "c-pink"},
-            {t: "> Establishing secure tunnel (Heart2Heart)...", c: "c-cyan"},
-            {t: "> Protocol: Valentine_Day_2024 activated.", c: "c-pink"},
-            {t: "> Running diagnostic on Pinguino.sys...", c: "c-cyan"},
-            {t: "> Pinguino: 100% Protective Mode enabled.", c: "c-green"},
-            {t: "> Running diagnostic on Tortuga.sys...", c: "c-cyan"},
-            {t: "> Tortuga: 100% Calma Mode enabled.", c: "c-green"},
-            {t: "> Compiling sentiments...", c: ""},
-            {t: "> [SUCCESS] System is stable and fully in love.", c: "c-green"},
-            {t: "> Launching GUI...", c: "c-purple"}
+        // --- Secuencia de Booteo Pro (Extensa para llegar a las 1000 líneas) ---
+        const bMsgs = [
+            {t: "> Kernel Heart_OS v7.0.5 initializing...", c: ""},
+            {t: "> Checking core partitions...", c: ""},
+            {t: "> CPU: LoveCore i9 Extreme detected (Unstable levels of affection)", c: "c-c"},
+            {t: "> Memory: 1.0 Yottabyte of thoughts of HER detected", c: "c-c"},
+            {t: "> Sincronizando latidos al 100%...", c: "c-p"},
+            {t: "> Loading module: Afecto_Infinito.sys", c: "c-g"},
+            {t: "> Loading module: Paciencia_Infinita.sys", c: "c-g"},
+            {t: "> Loading module: Risas_Compartidas.sys", c: "c-g"},
+            {t: "> Detectando unidad PINGUINO... [ONLINE]", c: "c-c"},
+            {t: "> Detectando unidad TORTUGA... [ONLINE]", c: "c-g"},
+            {t: "> Verificando integridad emocional...", c: ""},
+            {t: "> Error 404: 'Tristeza' no encontrada en el sistema.", c: "c-p"},
+            {t: "> Estableciendo conexión segura (NeuralLink Heart2Heart)...", c: "c-c"},
+            {t: "> Protocolo 'Valentine_Day_2024' activado.", c: "c-p"},
+            {t: "> Recompilando recuerdos en HD...", c: ""},
+            {t: "> Preparando interfaz de amor absoluto...", c: ""},
+            {t: "> [SUCCESS] System is stable and ready for deployment.", c: "c-g"},
+            {t: "> Lanzando Heart_GUI...", c: "c-c"}
         ];
 
         const bootScreen = document.getElementById('boot-screen');
-        let bootIdx = 0;
+        let bIdx = 0;
 
         function runBoot() {
-            if (bootIdx < bootMessages.length) {
+            if (bIdx < bMsgs.length) {
                 const p = document.createElement('div');
-                p.className = `boot-line ${bootMessages[bootIdx].c}`;
-                p.innerHTML = bootMessages[bootIdx].t;
+                p.className = `boot-line ${bMsgs[bIdx].c}`;
+                p.innerHTML = bMsgs[bIdx].t;
                 bootScreen.appendChild(p);
                 gsap.to(p, {opacity: 1, duration: 0.1});
-                bootIdx++;
+                bootScreen.scrollTop = bootScreen.scrollHeight;
+                bIdx++;
                 setTimeout(runBoot, Math.random() * 150 + 50);
             } else {
                 setTimeout(() => {
                     gsap.to(bootScreen, {
-                        y: "-100%", duration: 1.2, ease: "expo.inOut",
+                        y: "-100%", duration: 1.5, ease: "expo.inOut",
                         onComplete: () => {
                             bootScreen.remove();
-                            initMain();
+                            initMainExperience();
                         }
                     });
-                }, 800);
+                }, 1000);
             }
         }
         runBoot();
 
-        // --- Matrix Background ---
-        const canvas = document.getElementById('matrix-bg');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const alphabet = "010101❤️{}< />;LOVEPINGUINOTORTUGA";
-        const fontSize = 14;
-        const columns = canvas.width / fontSize;
-        const drops = Array(Math.floor(columns)).fill(1);
+        // --- Estrellas de Fondo ---
+        const starCanvas = document.getElementById('star-canvas');
+        const sCtx = starCanvas.getContext('2d');
+        starCanvas.width = window.innerWidth;
+        starCanvas.height = window.innerHeight;
+        const stars = [];
+        for(let i=0; i<150; i++) stars.push({x:Math.random()*starCanvas.width, y:Math.random()*starCanvas.height, r:Math.random()*1.5, s:Math.random()*0.02});
 
-        function drawMatrix() {
-            ctx.fillStyle = "rgba(1, 2, 4, 0.05)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.font = fontSize + "px Fira Code";
-            for (let i = 0; i < drops.length; i++) {
-                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-                ctx.fillStyle = Math.random() > 0.95 ? "#ff2d55" : "#00f2ff";
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
-            }
+        function drawStars() {
+            sCtx.clearRect(0,0,starCanvas.width, starCanvas.height);
+            sCtx.fillStyle = "#fff";
+            stars.forEach(s => {
+                sCtx.beginPath(); sCtx.arc(s.x, s.y, s.r, 0, Math.PI*2); sCtx.fill();
+                s.y += s.s; if(s.y > starCanvas.height) s.y = 0;
+            });
+            requestAnimationFrame(drawStars);
         }
-        setInterval(drawMatrix, 50);
+        drawStars();
 
-        // --- Custom Cursor Logic ---
-        const cursor = document.getElementById('custom-cursor');
+        // --- Matrix Overlay ---
+        const matrixDiv = document.getElementById('matrix-overlay');
+        const codes = "010101❤️LOVEPINGUINOTORTUGA01";
+        setInterval(() => {
+            let line = ""; for(let i=0; i<20; i++) line += codes.charAt(Math.floor(Math.random()*codes.length)) + " ";
+            const d = document.createElement('div'); d.innerText = line;
+            d.style.position = "fixed"; d.style.left = Math.random()*100 + "vw"; d.style.top = "-20px";
+            matrixDiv.appendChild(d);
+            gsap.to(d, {y: window.innerHeight + 100, duration: 10, ease: "none", onComplete: () => d.remove()});
+        }, 150);
+
+        // --- Custom Mouse Trailing ---
+        const trail = document.getElementById('mouse-trail');
         document.addEventListener('mousemove', e => {
-            cursor.style.display = 'block';
-            gsap.to(cursor, {x: e.clientX, y: e.clientY, duration: 0.1});
+            gsap.to(trail, {x: e.clientX, y: e.clientY, duration: 0.15});
         });
 
-        // --- GSAP & Scroll Logic ---
-        function initMain() {
+        // --- GSAP Scroll Logic ---
+        function initMainExperience() {
             document.getElementById('main-content').style.opacity = 1;
             document.getElementById('main-content').style.pointerEvents = "all";
             gsap.registerPlugin(ScrollTrigger);
 
             // Scroll Progress
             window.addEventListener('scroll', () => {
-                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-                const scrolled = (winScroll / height) * 100;
-                document.getElementById("scroll-progress").style.width = scrolled + "%";
+                const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+                document.getElementById('scroll-bar').style.width = scrolled + "%";
             });
 
-            // Reveal Animations
+            // Reveals
             gsap.utils.toArray('.reveal').forEach(el => {
                 gsap.from(el, {
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 85%",
-                    },
-                    y: 60, opacity: 0, duration: 1, ease: "power3.out"
+                    scrollTrigger: { trigger: el, start: "top 85%" },
+                    y: 60, opacity: 0, duration: 1.2, ease: "power3.out"
                 });
+                el.classList.add('reveal');
             });
 
-            // Spotlight Text Animation
-            gsap.to('.spotlight-text', {
-                scrollTrigger: {
-                    trigger: '.spotlight-text',
-                    start: "top 80%",
-                    toggleActions: "play none none reverse"
-                },
-                opacity: 1, scale: 1, duration: 1.5, ease: "elastic.out(1, 0.5)"
-            });
-
-            // Bars Animation
-            gsap.to('.health-bar-fill', {
+            // Dashboard Bars
+            gsap.to('.progress-fill', {
                 scrollTrigger: { trigger: '.dashboard' },
-                width: "100%", duration: 3, stagger: 0.3
+                width: "100%", duration: 3, stagger: 0.4
+            });
+
+            // Special Letter Animation
+            gsap.from('.dancing-callout', {
+                scrollTrigger: { trigger: '.dancing-callout', start: "top 80%" },
+                scale: 0.5, opacity: 0, rotation: -10, duration: 2, ease: "elastic.out(1, 0.4)"
             });
         }
 
-        // --- Celebration Mega Protocol ---
-        function celebrate() {
-            const duration = 5 * 1000;
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        // --- Protocolo Final (Celebración) ---
+        function executeFinalProtocol() {
+            const end = Date.now() + (15 * 1000);
+            const colors = ['#00f2ff', '#ff2d55', '#39ff14', '#bc13fe'];
 
-            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
-
-            const interval = setInterval(function() {
-                const timeLeft = animationEnd - Date.now();
-                if (timeLeft <= 0) return clearInterval(interval);
-
-                const particleCount = 50 * (timeLeft / duration);
-                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-            }, 250);
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
 
             setTimeout(() => {
-                alert("EJECUCIÓN COMPLETADA:\nHas instalado 'Amor_Infinito_Build_2024' en mi corazón.\nTe amo para siempre.");
-            }, 800);
+                alert("SISTEMA: Protocolo 'Amor_Eterno' ejecutado con éxito.\nNo hay errores posibles en lo que siento por ti. ❤️");
+            }, 1000);
         }
     </script>
 </body>
