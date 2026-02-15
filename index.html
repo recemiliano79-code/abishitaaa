@@ -3,507 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuestro Mundo: Pingüinos y Tortugas</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&family=Pacifico&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <title>root@corazon:~# ./amor.sh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500&family=Montserrat:wght@300;700&family=Pacifico&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --ice-blue: #e0f7fa;
-            --deep-ocean: #0077be;
-            --sand-gold: #f4d03f;
-            --turtle-green: #2ecc71;
-            --penguin-black: #2c3e50;
-            --love-red: #ff4d6d;
-            --glass: rgba(255, 255, 255, 0.8);
+            --neon-pink: #ff007f;
+            --neon-blue: #00f3ff;
+            --terminal-bg: #0d0208;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --turtle-green: #00ff88;
+            --penguin-white: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Quicksand', sans-serif;
+            background-color: var(--terminal-bg);
+            color: #e0e0e0;
+            font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
-            background: linear-gradient(to bottom, #b3e5fc 0%, #ffffff 20%, #ffffff 80%, #ffcc80 100%);
-            cursor: url('https://cur.cursors-4u.net/symbols/sym-9/sym847.cur'), auto;
+            scroll-behavior: smooth;
         }
 
-        /* --- Escenario de Fondo --- */
-        #world-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            z-index: -1;
-            width: 100%; height: 100%;
-        }
-
-        /* --- Preloader Mágico --- */
-        #loader {
+        /* --- Consola de Carga Inicial --- */
+        #loading-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            z-index: 9999;
+            background: #000;
+            z-index: 10000;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            padding: 40px;
+            font-family: 'Fira Code', monospace;
+            color: var(--neon-blue);
         }
 
-        .loader-anim {
-            width: 200px;
-            height: 100px;
-            position: relative;
+        .cursor { display: inline-block; width: 10px; height: 20px; background: var(--neon-blue); animation: blink 0.8s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- Fondo Matrix Romántico --- */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0; z-index: -1;
+            opacity: 0.3;
         }
 
-        /* --- Pingüino CSS --- */
-        .penguin {
-            width: 60px; height: 70px;
-            background: var(--penguin-black);
-            border-radius: 50% 50% 30% 30%;
-            position: relative;
-            animation: waddle 1s infinite alternate;
+        /* --- Barra de Progreso --- */
+        #progress-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: #111;
+            z-index: 999;
         }
-        .penguin::before { /* Panza */
-            content: '';
-            position: absolute;
-            width: 40px; height: 50px;
-            background: white;
-            bottom: 5px; left: 10px;
-            border-radius: 50%;
-        }
-        .penguin-eye {
-            position: absolute;
-            width: 6px; height: 6px;
-            background: black;
-            border-radius: 50%;
-            top: 20px;
-        }
-        .eye-l { left: 18px; } .eye-r { right: 18px; }
-        .beak {
-            position: absolute;
-            width: 10px; height: 8px;
-            background: #f39c12;
-            top: 28px; left: 25px;
-            clip-path: polygon(50% 100%, 0 0, 100% 0);
+        #progress-bar {
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            box-shadow: 0 0 10px var(--neon-pink);
         }
 
-        /* --- Tortuga CSS --- */
-        .turtle {
-            width: 80px; height: 50px;
-            position: relative;
-            animation: swim 3s infinite ease-in-out;
-        }
-        .shell {
-            width: 60px; height: 40px;
-            background: var(--turtle-green);
-            border-radius: 50% 50% 40% 40%;
-            border: 3px solid #1e8449;
-            position: relative;
-            z-index: 2;
-        }
-        .turtle-head {
-            width: 25px; height: 20px;
-            background: #58d68d;
-            border-radius: 50%;
-            position: absolute;
-            right: -15px; top: 10px;
-        }
-        .flipper {
-            width: 20px; height: 30px;
-            background: #58d68d;
-            border-radius: 50%;
-            position: absolute;
-            z-index: 1;
-        }
-        .f-top { top: -10px; left: 10px; transform: rotate(45deg); }
-        .f-bot { bottom: -10px; left: 10px; transform: rotate(-45deg); }
-
-        /* --- Animaciones Personajes --- */
-        @keyframes waddle {
-            from { transform: rotate(-5deg) translateY(0); }
-            to { transform: rotate(5deg) translateY(-5px); }
-        }
-        @keyframes swim {
-            0%, 100% { transform: translateX(0) translateY(0); }
-            50% { transform: translateX(20px) translateY(-10px); }
+        /* --- Contenedor Principal --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 100px 20px;
         }
 
-        /* --- Secciones de Contenido --- */
-        .hero {
+        /* --- Header Cyber-Romance --- */
+        header {
             height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 20px;
         }
 
-        .hero h1 {
+        .hero-title {
             font-family: 'Pacifico', cursive;
-            font-size: 4.5rem;
-            color: var(--deep-ocean);
-            text-shadow: 4px 4px 0px white;
+            font-size: 5rem;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(255,0,127,0.5));
             margin-bottom: 20px;
         }
 
-        .main-content {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-            padding: 50px 20px;
+        .code-piropo {
+            font-family: 'Fira Code', monospace;
+            color: var(--neon-blue);
+            background: rgba(0, 243, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 5px;
+            border-left: 4px solid var(--neon-blue);
+            margin: 10px 0;
         }
 
-        .thought-bubble {
-            background: var(--glass);
-            padding: 40px;
-            border-radius: 50px;
-            margin-bottom: 80px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        /* --- Carta Interactiva --- */
+        .letter-module {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 50px;
+            margin: 100px 0;
             position: relative;
-            border: 2px solid white;
-            transform: translateY(50px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .letter-module::before {
+            content: "LoveModule.exe";
+            position: absolute;
+            top: -15px; left: 30px;
+            background: var(--neon-pink);
+            padding: 2px 15px;
+            border-radius: 5px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+        }
+
+        .paragraph {
+            font-size: 1.25rem;
+            line-height: 2;
+            margin-bottom: 30px;
             opacity: 0;
+            transform: translateX(-30px);
             transition: 1s all ease;
         }
 
-        .thought-bubble.visible {
-            transform: translateY(0);
+        .paragraph.visible {
             opacity: 1;
+            transform: translateX(0);
         }
 
-        /* Triangulito de la burbuja */
-        .thought-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -20px; left: 50px;
-            border-width: 20px 20px 0;
-            border-style: solid;
-            border-color: white transparent;
-        }
-
-        .text-body {
-            font-size: 1.3rem;
-            line-height: 2;
-            color: #444;
-            text-align: left;
-        }
-
-        .te-amo-giant {
+        .te-amo-center {
             font-family: 'Pacifico', cursive;
-            font-size: 6rem;
-            color: var(--love-red);
+            font-size: 7rem;
             text-align: center;
-            margin: 60px 0;
-            display: block;
-            animation: pulse-love 2s infinite;
+            margin: 80px 0;
+            color: var(--neon-pink);
+            text-shadow: 0 0 20px var(--neon-pink);
         }
 
-        @keyframes pulse-love {
-            0% { transform: scale(1); filter: drop-shadow(0 0 0px var(--love-red)); }
-            50% { transform: scale(1.1); filter: drop-shadow(0 0 20px var(--love-red)); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 0px var(--love-red)); }
-        }
-
-        .verse-card {
-            background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
-            border-left: 10px solid var(--deep-ocean);
-            padding: 30px;
-            margin: 30px 0;
-            border-radius: 0 30px 30px 0;
-            font-family: 'Caveat', cursive;
-            font-size: 2rem;
-        }
-
-        /* --- Galería de "Momentos" (Pingüinos y Tortugas juntos) --- */
-        .illustration-box {
+        /* --- Pingüino y Tortuga Cyber --- */
+        .character-box {
             display: flex;
-            justify-content: space-around;
-            align-items: center;
+            justify-content: center;
+            gap: 100px;
             margin: 50px 0;
         }
 
-        .heart-container {
-            font-size: 50px;
-            color: var(--love-red);
-            animation: bounce 1s infinite alternate;
+        /* PINGÜINO CSS */
+        .cyber-penguin {
+            width: 100px; height: 120px;
+            background: #000;
+            border-radius: 50% 50% 30% 30%;
+            position: relative;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+        .cyber-penguin::after {
+            content: ''; position: absolute;
+            width: 70px; height: 90px;
+            background: white; bottom: 5px; left: 15px;
+            border-radius: 50%;
         }
 
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-20px); }
+        /* TORTUGA CSS */
+        .cyber-turtle {
+            width: 120px; height: 80px;
+            position: relative;
+            filter: drop-shadow(0 0 10px var(--turtle-green));
+        }
+        .turtle-shell {
+            width: 100px; height: 70px;
+            background: #1a1a1a;
+            border: 2px solid var(--turtle-green);
+            border-radius: 50% 50% 40% 40%;
+            display: flex; flex-wrap: wrap; padding: 10px;
         }
 
-        /* --- Footer Especial --- */
+        /* --- Footer --- */
         footer {
             height: 100vh;
-            background: linear-gradient(to bottom, transparent, #ffcc80);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
+            background: linear-gradient(to top, #000, transparent);
         }
 
-        .gift-box {
-            width: 150px; height: 150px;
-            background: var(--love-red);
-            border-radius: 10px;
-            position: relative;
+        .commit-btn {
+            background: transparent;
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-family: 'Fira Code', monospace;
             cursor: pointer;
-            transition: 0.5s;
+            transition: 0.3s;
+            border-radius: 10px;
+            text-transform: uppercase;
         }
 
-        .gift-box::before { /* Cinta */
-            content: '';
-            position: absolute;
-            width: 20px; height: 100%;
-            background: gold;
-            left: 65px;
+        .commit-btn:hover {
+            background: var(--neon-pink);
+            color: white;
+            box-shadow: 0 0 40px var(--neon-pink);
+            transform: scale(1.1);
         }
 
-        .gift-box:hover { transform: rotate(10deg) scale(1.1); }
-
-        .final-msg {
-            font-family: 'Pacifico', cursive;
-            font-size: 2rem;
-            color: #d35400;
-            margin-top: 30px;
+        .comment-code {
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
         }
 
-        /* --- Decoraciones de fondo --- */
-        .cloud {
-            position: absolute;
-            background: white;
-            border-radius: 100px;
-            opacity: 0.8;
-            z-index: -1;
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .te-amo-center { font-size: 4rem; }
+            .letter-module { padding: 25px; }
+            .character-box { flex-direction: column; align-items: center; gap: 50px; }
         }
-
-        /* --- Custom Scrollbar --- */
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: var(--deep-ocean); border-radius: 5px; }
-
     </style>
 </head>
 <body>
 
-    <!-- Loader -->
-    <div id="loader">
-        <div class="loader-anim">
-            <div class="penguin" style="position: absolute; left: 0;">
-                <div class="penguin-eye eye-l"></div>
-                <div class="penguin-eye eye-r"></div>
-                <div class="beak"></div>
-            </div>
-            <div class="turtle" style="position: absolute; right: 0;">
-                <div class="shell"></div>
-                <div class="turtle-head"></div>
-                <div class="flipper f-top"></div>
-                <div class="flipper f-bot"></div>
-            </div>
-        </div>
-        <h2 style="margin-top: 40px; color: var(--deep-ocean); font-family: 'Pacifico';">Construyendo nuestro mundo...</h2>
+    <div id="progress-container"><div id="progress-bar"></div></div>
+
+    <!-- Terminal de Carga -->
+    <div id="loading-screen">
+        <div id="terminal-text"></div>
+        <span class="cursor"></span>
     </div>
 
-    <canvas id="world-canvas"></canvas>
+    <canvas id="matrix-canvas"></canvas>
 
-    <!-- Inicio -->
-    <section class="hero">
-        <div class="heart-container">❤</div>
-        <h1>Mi pedacito de alma</h1>
-        <p style="font-size: 1.5rem; color: #555;">Haz scroll para viajar conmigo...</p>
-    </section>
-
-    <!-- Contenido -->
-    <div class="main-content">
+    <div class="container">
         
-        <div class="thought-bubble">
-            <div class="text-body">
-                Hoy, 14 de febrero, no quiero escribirte un simple mensaje… quiero escribirte una promesa envuelta en palabras, un abrazo convertido en letras, un pedacito de mi alma entregado en cada línea.
-            </div>
-        </div>
+        <header>
+            <div class="code-piropo">// sudo apt-get install felicidad</div>
+            <h1 class="hero-title">Mi lugar favorito.exe</h1>
+            <div class="code-piropo">while(alive) { love(you); }</div>
+        </header>
 
-        <span class="te-amo-giant">Te amo.</span>
-
-        <div class="thought-bubble">
-            <div class="text-body">
-                Y cuando lo digo, no lo digo como una frase bonita que se pierde en el aire. Lo digo como algo que nace profundo, que crece cada día, que late fuerte cuando pienso en ti. Te amo con la certeza de quien ha encontrado algo valioso, algo que no quiere perder jamás. Me importas demasiado, más de lo que imaginas, más de lo que a veces logro demostrar. Eres parte de mis pensamientos diarios, de mis sueños despierto, de mis ilusiones más sinceras.
+        <section class="letter-module">
+            
+            <div class="paragraph">
+                <span style="color:var(--neon-blue)">[INFO]</span> Hoy, 14 de febrero, no quiero escribirte un simple mensaje… quiero escribirte una promesa envuelta en palabras, un abrazo convertido en letras, un pedacito de mi alma entregado en cada línea.
             </div>
-        </div>
 
-        <!-- Ilustración 1 -->
-        <div class="illustration-box">
-            <div class="penguin">
-                <div class="penguin-eye eye-l"></div>
-                <div class="penguin-eye eye-r"></div>
-                <div class="beak"></div>
-            </div>
-            <div style="font-size: 40px;">❄️ 🤝 🌊</div>
-            <div class="turtle">
-                <div class="shell"></div>
-                <div class="turtle-head"></div>
-                <div class="flipper f-top"></div>
-                <div class="flipper f-bot"></div>
-            </div>
-        </div>
+            <div class="te-amo-center">Te amo.</div>
 
-        <div class="thought-bubble">
-            <div class="text-body">
+            <div class="paragraph">
+                <span style="color:var(--neon-blue)">[LOG]</span> Y cuando lo digo, no lo digo como una frase bonita que se pierde en el aire. Lo digo como algo que nace profundo, que crece cada día, que late fuerte cuando pienso en ti. Te amo con la certeza de quien ha encontrado algo valioso, algo que no quiere perder jamás. Me importas demasiado, más de lo que imaginas, más de lo que a veces logro demostrar. Eres parte de mis pensamientos diarios, de mis sueños despierto, de mis ilusiones más sinceras.
+            </div>
+
+            <div class="character-box">
+                <div class="cyber-penguin">
+                    <div style="position:absolute; width:10px; height:10px; background:var(--neon-blue); border-radius:50%; top:30px; left:20px;"></div>
+                    <div style="position:absolute; width:10px; height:10px; background:var(--neon-blue); border-radius:50%; top:30px; right:20px;"></div>
+                </div>
+                <div style="display:flex; align-items:center; color:var(--neon-pink); font-size:2rem;">&lt; / &gt;</div>
+                <div class="cyber-turtle">
+                    <div class="turtle-shell"></div>
+                    <div style="position:absolute; width:20px; height:20px; background:var(--turtle-green); border-radius:50%; right:-10px; top:30px;"></div>
+                </div>
+            </div>
+
+            <div class="paragraph">
                 Desde que llegaste a mi vida, todo tiene un brillo diferente. No hiciste magia… fuiste tú. Tu forma tan única de ser, tu esencia tan auténtica, tu manera de hablar, de reír, de mirar. Me enamoré sin darme cuenta, poco a poco, detalle por detalle. Me enamoré de tu corazón, de tu mente, de tu luz.
             </div>
-        </div>
 
-        <div class="thought-bubble">
-            <div class="text-body">
+            <div class="code-piropo">Eres el ; que le da sentido a mi vida</div>
+
+            <div class="paragraph">
                 Me encanta pasar tiempo contigo, y no importa cómo ni dónde. Si estamos caminando, si estamos hablando por horas, si estamos compartiendo un momento sencillo… para mí todo se vuelve especial solo porque estás tú. Contigo el tiempo no pesa, no corre, no se siente igual. Se transforma en algo suave, en algo que quisiera guardar para siempre.
             </div>
-        </div>
 
-        <div class="thought-bubble">
-            <div class="text-body">
+            <div class="paragraph" style="border-left: 2px solid var(--neon-pink); padding-left: 20px;">
                 Contigo me siento feliz, pero no es una felicidad ruidosa o superficial. Es una felicidad tranquila, profunda, de esas que te llenan por dentro y te hacen sentir completo. Me haces sentir seguro, amado, escuchado. Me haces sentir que puedo ser yo mismo sin miedo, sin máscaras, sin dudas. Y eso es un regalo enorme.
             </div>
-        </div>
 
-        <div class="thought-bubble">
-            <div class="text-body">
+            <div class="paragraph">
                 Me tienes completamente enamorado. Enamorado de tu sonrisa que ilumina incluso mis días más grises. Enamorado de tus pensamientos, de tus sueños, de tus metas. Enamorado de tu fuerza, de tu dulzura, de tu manera tan tuya de existir. Eres diferente, y esa diferencia es lo que te hace tan increíble.
             </div>
-        </div>
 
-        <div class="thought-bubble">
-            <div class="text-body">
+            <div class="code-piropo">Error 404: Tu belleza no se encuentra en este mundo.</div>
+
+            <div class="paragraph">
                 Quiero pasar mucho tiempo a tu lado. No solo momentos bonitos, sino procesos completos. Quiero vivir contigo las etapas que vengan, crecer juntos, apoyarnos cuando algo duela, celebrarnos cuando algo salga bien. Quiero cumplir nuestras promesas, construir sueños en conjunto, trazar planes que nos incluyan siempre a los dos.
             </div>
-        </div>
 
-        <div class="thought-bubble">
-            <div class="text-body">
+            <div class="paragraph">
                 Quiero aprender contigo. Aprender a amar mejor, a escuchar mejor, a entender más. Quiero que nos enseñemos mutuamente a ser más fuertes, más pacientes, más valientes. Quiero que nuestro amor no solo sea sentimiento, sino también decisión, compromiso y cuidado.
             </div>
-        </div>
 
-        <div class="thought-bubble">
-            <div class="text-body">
+            <div class="paragraph">
                 Quiero hacer muchas cosas contigo: reír hasta que falte el aire, hablar hasta que amanezca, abrazarte sin prisas, caminar de la mano sin importar el destino. Quiero crear recuerdos que se queden tatuados en el alma. Quiero mirar atrás algún día y sonreír al recordar todo lo que construimos juntos.
             </div>
-        </div>
 
-        <div class="verse-card">Si la vida es un viaje, quiero que seas mi compañera de camino.</div>
-        <div class="verse-card">Si el mundo se vuelve difícil, quiero ser tu apoyo.</div>
-        <div class="verse-card">Si dudas de ti, quiero recordarte lo increíble que eres.</div>
-        <div class="verse-card">Si el tiempo intenta separarnos, quiero luchar para que nos encuentre más fuertes.</div>
+            <div class="code-piropo" style="border-color: var(--neon-pink);">
+                git commit -m "Mi corazón para siempre"
+            </div>
 
-        <div class="thought-bubble">
-            <div class="text-body">
+            <div class="paragraph" style="color: var(--neon-blue); font-family: 'Fira Code', monospace;">
+                if (vida == viaje) compañero = "TÚ";<br>
+                if (mundo == dificil) apoyo = "TÚ";<br>
+                if (dudas == true) recordatorio = "Eres increíble";<br>
+                if (tiempo == separar) luchar = true;
+            </div>
+
+            <div class="paragraph">
                 Eres mi lugar favorito. Mi calma. Mi inspiración. Mi motivo para sonreír sin razón aparente. Eres ese pensamiento que aparece de repente y me cambia el ánimo por completo.
             </div>
-        </div>
 
-        <div class="thought-bubble">
-            <div class="text-body">
+            <div class="paragraph">
                 No sé cuánto tiempo nos regale la vida, pero sí sé que quiero aprovechar cada segundo contigo. Quiero elegirte todos los días, incluso cuando sea difícil, incluso cuando haya retos. Porque amarte no es solo un sentimiento bonito… es una decisión que tomo con orgullo.
             </div>
-        </div>
 
-        <div class="thought-bubble">
-            <div class="text-body" style="font-weight: bold; text-align: center;">
+            <div class="paragraph" style="text-align: center; border-top: 1px solid var(--glass-bg); padding-top: 30px;">
                 Gracias por existir. Gracias por ser tú, tan real, tan única, tan especial. Gracias por hacerme sentir este amor que me llena y me transforma.
             </div>
-        </div>
+
+        </section>
     </div>
 
     <footer>
-        <div class="gift-box" onclick="abrirRegalo()"></div>
-        <div class="final-msg" id="msg-final">Toca el regalo, mi vida...</div>
-        <p style="margin-top: 50px;">Hecho con todo el amor de mi corazón</p>
+        <button class="commit-btn" onclick="deployLove()">git push origin master</button>
+        <div class="comment-code">// Ejecutando amor_eterno.sh...</div>
+        <div id="final-status" style="margin-top: 20px; font-family: 'Fira Code';"></div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
-        // --- Lógica del Mundo de Fondo ---
-        const canvas = document.getElementById('world-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+        // --- Terminal de Carga ---
+        const terminalText = [
+            "Initializing love-system...",
+            "Loading Penguin_Assets... DONE",
+            "Loading Turtle_Shell... DONE",
+            "Compiling sentimientos.cpp...",
+            "Resolving dependencies: [Confianza, Risas, Pasión]",
+            "Security Check: No masks found. Authenticity 100%.",
+            "System ready. Pressing enter..."
+        ];
 
-        function init() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            for(let i=0; i<100; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 5 + 1,
-                    speed: Math.random() * 1 + 0.5,
-                    type: Math.random() > 0.5 ? 'snow' : 'bubble'
-                });
+        let lineIdx = 0;
+        const terminalDiv = document.getElementById('terminal-text');
+
+        function typeTerminal() {
+            if (lineIdx < terminalText.length) {
+                let p = document.createElement('div');
+                p.textContent = "> " + terminalText[lineIdx];
+                terminalDiv.appendChild(p);
+                lineIdx++;
+                setTimeout(typeTerminal, 300);
+            } else {
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.opacity = '0';
+                    setTimeout(() => document.getElementById('loading-screen').remove(), 1000);
+                }, 1000);
+            }
+        }
+        typeTerminal();
+
+        // --- Matrix Hearts Background ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = "010101❤️🐢🐧{;}";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let i = 0; i < columns; i++) drops[i] = 1;
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(13, 2, 8, 0.1)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = "#0f0"; // Verde matrix base
+            ctx.font = fontSize + "px 'Fira Code'";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                
+                if(text === '❤️') ctx.fillStyle = varColor('--neon-pink');
+                else if(text === '🐢' || text === '🐧') ctx.fillStyle = "#fff";
+                else ctx.fillStyle = varColor('--neon-blue');
+
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+                    drops[i] = 0;
+                
+                drops[i]++;
             }
         }
 
-        function draw() {
-            ctx.clearRect(0,0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                ctx.beginPath();
-                if(p.type === 'snow') {
-                    ctx.fillStyle = "white";
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-                    p.y += p.speed;
-                } else {
-                    ctx.strokeStyle = "rgba(0, 119, 190, 0.3)";
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-                    p.y -= p.speed;
-                }
-                ctx.fill();
-                ctx.stroke();
-
-                if(p.y > canvas.height) p.y = -10;
-                if(p.y < -10) p.y = canvas.height + 10;
-            });
-            requestAnimationFrame(draw);
+        function varColor(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name);
         }
 
-        init();
-        draw();
+        setInterval(drawMatrix, 50);
 
-        // --- Observador de Scroll ---
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting) entry.target.classList.add('visible');
+        // --- Barra de Progreso y Scroll Reveal ---
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+            
+            document.querySelectorAll('.paragraph').forEach(p => {
+                let top = p.getBoundingClientRect().top;
+                if(top < window.innerHeight - 100) p.classList.add('visible');
             });
-        }, { threshold: 0.1 });
+        };
 
-        document.querySelectorAll('.thought-bubble').forEach(b => observer.observe(b));
-
-        // --- Loader ---
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').remove(), 1000);
-            }, 2500);
-        });
-
-        // --- Regalo Final ---
-        function abrirRegalo() {
+        // --- Función Final ---
+        function deployLove() {
             confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#ff4d6d', '#f4d03f', '#2ecc71']
+                particleCount: 200,
+                spread: 90,
+                origin: { y: 0.7 },
+                colors: ['#ff007f', '#00f3ff', '#ffffff']
             });
-            document.getElementById('msg-final').innerHTML = "¡Eres mi pingüina favorita en este mundo de tortugas! ❤️";
-            document.getElementById('msg-final').style.color = "#ff4d6d";
-        }
-
-        // --- Generar nubes aleatorias ---
-        for(let i=0; i<15; i++) {
-            let cloud = document.createElement('div');
-            cloud.className = 'cloud';
-            cloud.style.width = Math.random() * 200 + 100 + 'px';
-            cloud.style.height = '40px';
-            cloud.style.top = Math.random() * 5000 + 'px';
-            cloud.style.left = Math.random() * 100 + 'vw';
-            cloud.style.opacity = Math.random() * 0.5;
-            document.body.appendChild(cloud);
+            document.getElementById('final-status').innerHTML = "[SUCCESS] Amor desplegado en producción con éxito. ❤️";
+            document.getElementById('final-status').style.color = "var(--turtle-green)";
         }
     </script>
 </body>
 </html>
+```
