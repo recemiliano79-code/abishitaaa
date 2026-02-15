@@ -1,88 +1,70 @@
-
-
-Model
-ThinkingThoughts
-Expand to view model thoughts
-
-chevron_right
-Esta versión es el **"Enterprise Level Love Repository"**. He reconstruido todo desde cero para que sea una experiencia inmersiva, optimizada para celulares y con un diseño de altísimo nivel.
-
-### Lo que hace a esta versión la mejor:
-1.  **Diseño Mobile-First:** Todo está pensado para que se vea increíble en un iPhone o Android, con botones táctiles y textos adaptables.
-2.  **Personajes "Cyber-Cute":** He diseñado al pingüino y a la tortuga usando **SVG avanzado dentro del código**. Ahora tienen sombras, parpadean, respiran y se mueven de forma orgánica.
-3.  **Inyección masiva de Piropos Tech:** He escondido bromas y piropos de programación en cada rincón del código y la interfaz.
-4.  **Efectos Visuales:**
-    *   **Background Neumórfico:** Un fondo que parece líquido.
-    *   **Partículas "Bit-Hearts":** Corazones que caen mezclados con símbolos de código (`{`, `}`, `=>`, `;`).
-    *   **Terminal de Inicio:** Una secuencia de "booteo" que simula hackear el sistema para encontrar el amor.
-5.  **Estructura de +800 líneas:** Contiene lógica compleja de animaciones y estilos para que no falte ni un detalle.
-
-Guarda este código como `mi_universo.html`:
-
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Protocolo: Amor_Eterno_V3.sh</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&family=Inter:wght@300;400;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <title>Main_Heart_Repository.exe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&family=Poppins:wght@300;400;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #6366f1; /* Indigo */
-            --secondary: #ec4899; /* Pink */
-            --accent: #10b981; /* Emerald/Turtle */
-            --dark: #0f172a;
-            --glass: rgba(15, 23, 42, 0.8);
-            --neon-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+            --bg-dark: #080a0f;
+            --card-bg: rgba(17, 25, 40, 0.75);
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff007f;
+            --neon-green: #39ff14;
+            --text-gray: #94a3b8;
         }
 
-        /* --- Reset & Base --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* --- Reset & Layout --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            background-color: var(--dark);
-            color: #f1f5f9;
-            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Poppins', sans-serif;
             overflow-x: hidden;
-            line-height: 1.6;
+            scroll-behavior: smooth;
         }
 
-        /* --- Terminal Boot (Mobile Optimized) --- */
-        #boot-sequence {
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-pink); border-radius: 10px; }
+
+        /* --- Loader / Boot Sequence --- */
+        #boot-loader {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: #000;
             z-index: 10000;
-            padding: 20px;
+            padding: 30px;
             font-family: 'Fira Code', monospace;
-            font-size: 14px;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
         }
 
-        .line { margin-bottom: 5px; opacity: 0; animation: fadeIn 0.1s forwards; }
-        .blue { color: var(--primary); }
-        .pink { color: var(--secondary); }
-        .green { color: var(--accent); }
+        .boot-line { margin-bottom: 5px; font-size: 14px; opacity: 0; animation: fadeIn 0.1s forwards; }
+        .cyan { color: var(--neon-cyan); }
+        .pink { color: var(--neon-pink); }
+        .green { color: var(--neon-green); }
 
-        /* --- Animaciones de Fondo --- */
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
-
-        /* --- Progress Bar --- */
-        #love-progress {
+        /* --- Fondo Matrix Suave --- */
+        #matrix-bg {
             position: fixed;
-            top: 0; left: 0; width: 0%; height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            z-index: 999;
-            box-shadow: var(--neon-shadow);
+            top: 0; left: 0; z-index: -1;
+            opacity: 0.15;
+            filter: blur(1px);
         }
 
-        /* --- Layout --- */
-        .wrapper { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; position: relative; }
+        /* --- Container --- */
+        .wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
+        /* --- Hero / Header --- */
         header {
             height: 100vh;
             display: flex;
@@ -92,240 +74,332 @@ Guarda este código como `mi_universo.html`:
             text-align: center;
         }
 
-        .piropo-float {
+        .dev-badge {
             font-family: 'Fira Code', monospace;
-            font-size: 0.8rem;
-            background: rgba(99, 102, 241, 0.1);
-            padding: 5px 12px;
-            border-radius: 20px;
-            border: 1px solid var(--primary);
-            margin-bottom: 15px;
-            animation: floating 3s infinite ease-in-out;
+            font-size: 12px;
+            padding: 5px 15px;
+            border-radius: 50px;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
         }
 
         .main-title {
             font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(to right, #fff, var(--secondary));
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, var(--neon-pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            line-height: 1.1;
         }
 
-        /* --- Personajes SVG (Diseño Mejorado) --- */
-        .char-container {
+        /* --- SECCIÓN MEJORADA: PINGÜINO & TORTUGA --- */
+        .interaction-area {
+            margin: 60px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 30px;
+            padding: 40px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
-            justify-content: space-around;
+            flex-direction: column;
             align-items: center;
+            gap: 30px;
+            position: relative;
+        }
+
+        .characters-flex {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
             width: 100%;
-            margin: 40px 0;
         }
 
-        .svg-icon {
-            width: 120px;
-            height: 120px;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+        /* Pingüino Detallado SVG */
+        .penguin-wrap {
+            width: 130px;
+            filter: drop-shadow(0 0 20px rgba(0, 243, 255, 0.4));
+            animation: breathe 3s infinite ease-in-out;
         }
 
-        .penguin-svg { animation: penguinWaddle 2s infinite ease-in-out; }
-        .turtle-svg { animation: turtleSwim 4s infinite ease-in-out; }
-
-        @keyframes penguinWaddle {
-            0%, 100% { transform: rotate(-5deg) translateY(0); }
-            50% { transform: rotate(5deg) translateY(-10px); }
+        /* Tortuga Detallada SVG */
+        .turtle-wrap {
+            width: 130px;
+            filter: drop-shadow(0 0 20px rgba(57, 255, 20, 0.4));
+            animation: breathe 3s infinite ease-in-out 1.5s;
         }
 
-        @keyframes turtleSwim {
-            0%, 100% { transform: translateX(0) scale(1); }
-            50% { transform: translateX(15px) scale(1.05); }
+        .code-divider {
+            font-family: 'Fira Code', monospace;
+            font-size: 2rem;
+            color: var(--neon-pink);
+            text-shadow: 0 0 15px var(--neon-pink);
+            animation: pulse-pink 2s infinite;
         }
 
-        /* --- La Carta (Estilo Dev Luxury) --- */
-        .card {
-            background: var(--glass);
+        /* --- Love Terminal --- */
+        .love-terminal {
+            width: 100%;
+            background: #010204;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-r { background: #ff5f56; }
+        .dot-y { background: #ffbd2e; }
+        .dot-g { background: #27c93f; }
+
+        /* --- Cards de Mensajes --- */
+        .message-card {
+            background: var(--card-bg);
             backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            padding: 35px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 40px;
+            transform: translateY(30px);
             opacity: 0;
-            transform: translateY(40px);
             transition: 1s all ease;
         }
 
-        .card.visible { opacity: 1; transform: translateY(0); }
+        .message-card.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
 
         .paragraph {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-size: 1.1rem;
+            line-height: 1.8;
             color: #cbd5e1;
             text-align: justify;
         }
 
-        .te-amo-box {
+        .highlight-te-amo {
             font-family: 'Dancing Script', cursive;
-            font-size: 4rem;
-            color: var(--secondary);
+            font-size: 5rem;
             text-align: center;
-            margin: 40px 0;
-            text-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+            color: var(--neon-pink);
+            text-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+            margin: 50px 0;
         }
 
-        .code-snippet {
-            background: #1e293b;
+        /* --- Piropos de Programación Estilizados --- */
+        .code-piropo {
+            background: rgba(0, 243, 255, 0.05);
+            border-left: 4px solid var(--neon-cyan);
             padding: 15px;
-            border-radius: 12px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
             margin: 20px 0;
-            border-left: 4px solid var(--secondary);
-            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--neon-cyan);
+            border-radius: 0 8px 8px 0;
         }
 
-        .verse {
-            border-left: 2px solid var(--primary);
-            padding-left: 20px;
-            font-style: italic;
-            color: var(--primary);
-            margin: 15px 0;
+        .verse-block {
+            padding: 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            margin: 20px 0;
         }
 
-        /* --- Footer & Action --- */
+        .verse-line {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--neon-pink);
+        }
+
+        /* --- Footer & Final Button --- */
         footer {
             padding: 100px 0;
             text-align: center;
         }
 
-        .commit-button {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
+        .deploy-btn {
+            background: transparent;
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
             padding: 20px 40px;
-            font-size: 1.2rem;
+            font-family: 'Fira Code', monospace;
             font-weight: 700;
-            border-radius: 50px;
+            border-radius: 12px;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
-            transition: 0.3s;
             text-transform: uppercase;
             letter-spacing: 2px;
+            transition: 0.4s;
+            position: relative;
+            overflow: hidden;
         }
 
-        .commit-button:active { transform: scale(0.95); }
+        .deploy-btn:hover {
+            background: var(--neon-pink);
+            color: #fff;
+            box-shadow: 0 0 30px var(--neon-pink);
+            transform: scale(1.05);
+        }
 
-        /* --- Keyframes --- */
+        /* --- Animaciones --- */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.05) translateY(-10px); }
+        }
+
+        @keyframes pulse-pink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes floating {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
 
-        /* --- Estrellas/Bits Flotantes --- */
-        .bit {
-            position: absolute;
-            color: var(--primary);
-            opacity: 0.2;
-            font-family: 'Fira Code';
-            pointer-events: none;
+        /* --- Mobile Optimization --- */
+        @media (max-width: 600px) {
+            .main-title { font-size: 2.2rem; }
+            .characters-flex { gap: 20px; }
+            .penguin-wrap, .turtle-wrap { width: 100px; }
+            .highlight-te-amo { font-size: 3.5rem; }
+            .message-card { padding: 20px; }
+            .code-divider { font-size: 1.2rem; }
         }
-
     </style>
 </head>
 <body>
 
-    <div id="love-progress"></div>
+    <!-- Progress Top Bar -->
+    <div id="scroll-progress" style="position: fixed; top: 0; left: 0; height: 3px; background: var(--neon-pink); z-index: 1001; width: 0%;"></div>
 
-    <!-- Pantalla de Booteo Hacker -->
-    <div id="boot-sequence"></div>
+    <!-- Boot Terminal -->
+    <div id="boot-loader"></div>
 
-    <canvas id="bg-canvas"></canvas>
+    <canvas id="matrix-bg"></canvas>
 
     <div class="wrapper">
-        
         <header>
-            <div class="piropo-float">while(soulmate == null) { find(you); }</div>
-            <h1 class="main-title">My_Universe</h1>
-            <p style="color: var(--accent); font-family: 'Fira Code';">[v3.0.0-Stable]</p>
+            <div class="dev-badge">git status: 100% ENAMORADO</div>
+            <h1 class="main-title">Mi_Lugar_Favorito<br>.sys</h1>
+            <p style="margin-top: 15px; color: var(--text-gray); font-family: 'Fira Code'; font-size: 0.9rem;">
+                Compiled with love for you
+            </p>
             
-            <div class="char-container">
-                <!-- Pinguino SVG -->
-                <svg class="svg-icon penguin-svg" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" fill="#0f172a" stroke="white" stroke-width="2"/>
-                    <ellipse cx="50" cy="65" rx="30" ry="30" fill="white"/>
-                    <circle cx="35" cy="40" r="4" fill="white">
-                        <animate attributeName="ry" values="4;0.5;4" dur="3s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="65" cy="40" r="4" fill="white">
-                        <animate attributeName="ry" values="4;0.5;4" dur="3s" repeatCount="indefinite" />
-                    </circle>
-                    <path d="M45 50 L55 50 L50 60 Z" fill="#fbbf24"/>
-                </svg>
+            <div class="interaction-area">
+                <div class="characters-flex">
+                    <!-- PINGÜINO MEJORADO -->
+                    <div class="penguin-wrap">
+                        <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Cuerpo -->
+                            <ellipse cx="50" cy="65" rx="40" ry="50" fill="#000" stroke="#00f3ff" stroke-width="2"/>
+                            <!-- Panza -->
+                            <ellipse cx="50" cy="75" rx="28" ry="35" fill="#fff"/>
+                            <!-- Ojos -->
+                            <circle cx="35" cy="45" r="4" fill="#00f3ff">
+                                <animate attributeName="opacity" values="1;0;1" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="65" cy="45" r="4" fill="#00f3ff">
+                                <animate attributeName="opacity" values="1;0;1" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                            <!-- Pico -->
+                            <path d="M45 55 L55 55 L50 65 Z" fill="#ff9f00"/>
+                            <!-- Aletas -->
+                            <path d="M10 60 Q0 70 5 85" stroke="#00f3ff" fill="none" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M90 60 Q100 70 95 85" stroke="#00f3ff" fill="none" stroke-width="4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
 
-                <!-- Tortuga SVG -->
-                <svg class="svg-icon turtle-svg" viewBox="0 0 100 100">
-                    <path d="M20 50 Q20 20 50 20 Q80 20 80 50 L20 50" fill="#10b981"/>
-                    <rect x="25" y="50" width="50" height="10" rx="5" fill="#059669"/>
-                    <circle cx="85" cy="45" r="8" fill="#34d399"/>
-                    <circle cx="88" cy="43" r="1.5" fill="black"/>
-                    <!-- Patas -->
-                    <ellipse cx="35" cy="60" rx="8" ry="4" fill="#34d399"/>
-                    <ellipse cx="65" cy="60" rx="8" ry="4" fill="#34d399"/>
-                </svg>
+                    <div class="code-divider">&lt; / &gt;</div>
+
+                    <!-- TORTUGA MEJORADA -->
+                    <div class="turtle-wrap">
+                        <svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Patas -->
+                            <ellipse cx="30" cy="70" rx="10" ry="5" fill="#39ff14"/>
+                            <ellipse cx="90" cy="70" rx="10" ry="5" fill="#39ff14"/>
+                            <!-- Cabeza -->
+                            <circle cx="105" cy="45" r="12" fill="#39ff14" stroke="#fff" stroke-width="0.5"/>
+                            <circle cx="110" cy="42" r="2" fill="#000"/>
+                            <!-- Caparazón -->
+                            <path d="M10 50 Q10 10 60 10 Q110 10 110 50 L10 50" fill="#1a1a1a" stroke="#39ff14" stroke-width="3"/>
+                            <!-- Patrón caparazón -->
+                            <circle cx="40" cy="30" r="5" fill="none" stroke="#39ff14" stroke-width="1" opacity="0.5"/>
+                            <circle cx="60" cy="25" r="6" fill="none" stroke="#39ff14" stroke-width="1" opacity="0.5"/>
+                            <circle cx="80" cy="35" r="5" fill="none" stroke="#39ff14" stroke-width="1" opacity="0.5"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="love-terminal">
+                    <div class="terminal-header">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div>
+                    </div>
+                    <div id="terminal-content" style="color: #39ff14;">
+                        > status: Online<br>
+                        > connection: Stable<br>
+                        > encryption: Heart2Heart_v2<br>
+                        > ping: 0ms (Contigo no hay distancia)
+                    </div>
+                </div>
             </div>
-            
-            <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.6;">(Scroll para descifrar mi corazón)</p>
         </header>
 
         <main>
-            <div class="card">
-                <div class="code-snippet">
-                    <span class="pink">import</span> { alma } <span class="pink">from</span> <span class="green">'mi_corazon'</span>;<br>
-                    <span class="blue">const</span> promesa = <span class="blue">new</span> Promise();
-                </div>
+            <!-- Párrafo 1 -->
+            <div class="message-card">
+                <div class="code-piropo">// sudo apt-get install felicidad_eterna</div>
                 <div class="paragraph">
                     Hoy, 14 de febrero, no quiero escribirte un simple mensaje… quiero escribirte una promesa envuelta en palabras, un abrazo convertido en letras, un pedacito de mi alma entregado en cada línea.
                 </div>
             </div>
 
-            <div class="te-amo-box">Te amo.</div>
+            <div class="highlight-te-amo">Te amo.</div>
 
-            <div class="card">
+            <!-- Párrafo 2 -->
+            <div class="message-card">
                 <div class="paragraph">
                     Y cuando lo digo, no lo digo como una frase bonita que se pierde en el aire. Lo digo como algo que nace profundo, que crece cada día, que late fuerte cuando pienso en ti. Te amo con la certeza de quien ha encontrado algo valioso, algo que no quiere perder jamás. Me importas demasiado, más de lo que imaginas, más de lo que a veces logro demostrar. Eres parte de mis pensamientos diarios, de mis sueños despierto, de mis ilusiones más sinceras.
                 </div>
-                <div class="code-snippet">
-                    <span class="green">// Tu belleza no tiene errores de compilación</span><br>
-                    <span class="pink">if</span> (piensoEnTi) corazon.beat++;
-                </div>
+                <div class="code-piropo">while(true) { queriéndote++; }</div>
             </div>
 
-            <div class="card">
+            <!-- Párrafo 3 -->
+            <div class="message-card">
                 <div class="paragraph">
                     Desde que llegaste a mi vida, todo tiene un brillo diferente. No hiciste magia… fuiste tú. Tu forma tan única de ser, tu esencia tan auténtica, tu manera de hablar, de reír, de mirar. Me enamoré sin darme cuenta, poco a poco, detalle por detalle. Me enamoré de tu corazón, de tu mente, de tu luz.
                 </div>
+                <div class="code-piropo">Eres el punto y coma (;) que le da sentido a mi código.</div>
+            </div>
+
+            <!-- Párrafo 4 y 5 -->
+            <div class="message-card">
                 <div class="paragraph">
                     Me encanta pasar tiempo contigo, y no importa cómo ni dónde. Si estamos caminando, si estamos hablando por horas, si estamos compartiendo un momento sencillo… para mí todo se vuelve especial solo porque estás tú. Contigo el tiempo no pesa, no corre, no se siente igual. Se transforma en algo suave, en algo que quisiera guardar para siempre.
                 </div>
-            </div>
-
-            <div class="piropo-float" style="text-align:center">Eres el CSS que le da estilo a mi HTML</div>
-
-            <div class="card">
                 <div class="paragraph">
                     Contigo me siento feliz, pero no es una felicidad ruidosa o superficial. Es una felicidad tranquila, profunda, de esas que te llenan por dentro y te hacen sentir completo. Me haces sentir seguro, amado, escuchado. Me haces sentir que puedo ser yo mismo sin miedo, sin máscaras, sin dudas. Y eso es un regalo enorme.
                 </div>
+            </div>
+
+            <!-- Párrafo 6 -->
+            <div class="message-card">
+                <div class="code-piropo">Tu sonrisa es mi framework favorito.</div>
                 <div class="paragraph">
                     Me tienes completamente enamorado. Enamorado de tu sonrisa que ilumina incluso mis días más grises. Enamorado de tus pensamientos, de tus sueños, de tus metas. Enamorado de tu fuerza, de tu dulzura, de tu manera tan tuya de existir. Eres diferente, y esa diferencia es lo que te hace tan increíble.
                 </div>
             </div>
 
-            <div class="card">
-                <div class="code-snippet">
-                    <span class="blue">while</span> (true) {<br>
-                    &nbsp;&nbsp;quererte(); <span class="green">// Infinite Loop</span><br>
-                    }
-                </div>
+            <!-- Párrafo 7 y 8 -->
+            <div class="message-card">
                 <div class="paragraph">
                     Quiero pasar mucho tiempo a tu lado. No solo momentos bonitos, sino procesos completos. Quiero vivir contigo las etapas que vengan, crecer juntos, apoyarnos cuando algo duela, celebrarnos cuando algo salga bien. Quiero cumplir nuestras promesas, construir sueños en conjunto, trazar planes que nos incluyan siempre a los dos.
                 </div>
@@ -334,145 +408,132 @@ Guarda este código como `mi_universo.html`:
                 </div>
             </div>
 
-            <div class="card">
+            <!-- Párrafo 9 -->
+            <div class="message-card">
                 <div class="paragraph">
                     Quiero hacer muchas cosas contigo: reír hasta que falte el aire, hablar hasta que amanezca, abrazarte sin prisas, caminar de la mano sin importar el destino. Quiero crear recuerdos que se queden tatuados en el alma. Quiero mirar atrás algún día y sonreír al recordar todo lo que construimos juntos.
                 </div>
-                
-                <div class="verse">Si la vida es un viaje, quiero que seas mi compañera de camino.</div>
-                <div class="verse">Si el mundo se vuelve difícil, quiero ser tu apoyo.</div>
-                <div class="verse">Si dudas de ti, quiero recordarte lo increíble que eres.</div>
-                <div class="verse">Si el tiempo intenta separarnos, quiero luchar para que nos encuentre más fuertes.</div>
+                <div class="verse-block">
+                    <span class="verse-line">Si la vida es un viaje, quiero que seas mi compañera.</span>
+                    <span class="verse-line">Si el mundo se vuelve difícil, quiero ser tu apoyo.</span>
+                    <span class="verse-line">Si dudas de ti, quiero recordarte lo increíble que eres.</span>
+                </div>
             </div>
 
-            <div class="card">
+            <!-- Párrafo 10 y 11 -->
+            <div class="message-card">
                 <div class="paragraph">
                     Eres mi lugar favorito. Mi calma. Mi inspiración. Mi motivo para sonreír sin razón aparente. Eres ese pensamiento que aparece de repente y me cambia el ánimo por completo.
                 </div>
+                <div class="code-piropo">No eres un bug, eres mi feature favorita.</div>
                 <div class="paragraph">
                     No sé cuánto tiempo nos regale la vida, pero sí sé que quiero aprovechar cada segundo contigo. Quiero elegirte todos los días, incluso cuando sea difícil, incluso cuando haya retos. Porque amarte no es solo un sentimiento bonito… es una decisión que tomo con orgullo.
                 </div>
-                <div class="code-snippet">
-                    <span class="pink">git</span> commit -m <span class="green">"Amor infinito sin conflictos de fusión"</span>
-                </div>
-                <div class="paragraph" style="text-align: center; font-weight: 800; color: white; margin-top: 30px;">
+            </div>
+
+            <!-- Final -->
+            <div class="message-card" style="border: 2px solid var(--neon-cyan);">
+                <div class="paragraph" style="text-align: center; font-weight: 700; color: #fff;">
                     Gracias por existir. Gracias por ser tú, tan real, tan única, tan especial. Gracias por hacerme sentir este amor que me llena y me transforma.
                 </div>
+                <div class="code-piropo" style="text-align: center;">git commit -m "Mi corazón para siempre"</div>
             </div>
         </main>
 
         <footer>
-            <div class="piropo-float">No eres un bug, eres mi feature favorita</div>
-            <button class="commit-button" onclick="celebrate()">DEPLOY_LOVE.exe</button>
-            <p style="margin-top: 20px; font-family: 'Fira Code'; font-size: 0.8rem; opacity: 0.5;">
-                // End of File. Forever together.
+            <button class="deploy-btn" onclick="deployCelebration()">Finalize_Deployment.exe</button>
+            <p style="margin-top: 30px; font-family: 'Fira Code'; font-size: 10px; opacity: 0.4;">
+                // Created with love and extreme attention to detail.
             </p>
         </footer>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
-        // --- Terminal de Booteo ---
-        const terminal = document.getElementById('boot-sequence');
-        const lines = [
-            {t: "Initializing Core_Heart.sys...", c: "blue"},
-            {t: "Scanning for soulmate...", c: "white"},
-            {t: "Match found: ERES TÚ.", c: "pink"},
-            {t: "Loading Penguin_Module... OK", c: "green"},
-            {t: "Loading Turtle_Module... OK", c: "green"},
-            {t: "Bypassing Gray_Days_Security...", c: "blue"},
-            {t: "Compiling feelings.cpp...", c: "white"},
-            {t: "Linker: Success. 0 Errors. Infinite Love.", c: "pink"},
-            {t: "Accessing UI...", c: "white"}
+        // --- Secuencia de Booteo ---
+        const bootLines = [
+            {t: "> Kernel inicializado...", c: "white"},
+            {t: "> Cargando módulo Pinguino_Turtle_V3...", c: "cyan"},
+            {t: "> Bypass Gray_Days_Security: OK", c: "green"},
+            {t: "> Compilando sentimientos...", c: "white"},
+            {t: "> Error 404: Tristeza no encontrada.", c: "pink"},
+            {t: "> Desplegando amor infinito...", c: "green"},
+            {t: "> Accediendo a la interfaz...", c: "cyan"}
         ];
 
-        let i = 0;
-        function type() {
-            if(i < lines.length) {
-                let div = document.createElement('div');
-                div.className = `line ${lines[i].c}`;
-                div.innerHTML = `> ${lines[i].t}`;
-                terminal.appendChild(div);
-                i++;
-                setTimeout(type, 150);
+        const bootLoader = document.getElementById('boot-loader');
+        let lineIdx = 0;
+
+        function runBoot() {
+            if (lineIdx < bootLines.length) {
+                let p = document.createElement('div');
+                p.className = `boot-line ${bootLines[lineIdx].c}`;
+                p.innerHTML = bootLines[lineIdx].t;
+                bootLoader.appendChild(p);
+                lineIdx++;
+                setTimeout(runBoot, 200);
             } else {
                 setTimeout(() => {
-                    terminal.style.transition = "1s";
-                    terminal.style.opacity = "0";
-                    setTimeout(() => terminal.remove(), 1000);
+                    bootLoader.style.transition = "1s";
+                    bootLoader.style.opacity = "0";
+                    setTimeout(() => bootLoader.remove(), 1000);
                 }, 1000);
             }
         }
-        type();
+        runBoot();
 
-        // --- Background Canvas ---
-        const canvas = document.getElementById('bg-canvas');
+        // --- Matrix Background ---
+        const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
-        let symbols = ['{', '}', ';', '=>', '()', '❤️', '0', '1'];
-        let particles = [];
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-        function initBG() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = [];
-            for(let i=0; i<40; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    text: symbols[Math.floor(Math.random()*symbols.length)],
-                    s: Math.random() * 15 + 10,
-                    v: Math.random() * 1 + 0.2
-                });
+        const letters = "01010101❤️{}< />;";
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        for (let i = 0; i < columns; i++) drops[i] = 1;
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(8, 10, 15, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + "px 'Fira Code'";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillStyle = Math.random() > 0.95 ? "#ff007f" : "#00f3ff";
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
             }
         }
+        setInterval(drawMatrix, 50);
 
-        function drawBG() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(99, 102, 241, 0.15)";
-            ctx.font = "20px 'Fira Code'";
-            particles.forEach(p => {
-                ctx.fillText(p.text, p.x, p.y);
-                p.y -= p.v;
-                if(p.y < -20) p.y = canvas.height + 20;
-            });
-            requestAnimationFrame(drawBG);
-        }
-        window.addEventListener('resize', initBG);
-        initBG();
-        drawBG();
-
-        // --- Scroll Logic ---
+        // --- Scroll Reveal ---
         window.addEventListener('scroll', () => {
-            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            let scrolled = (winScroll / height) * 100;
-            document.getElementById("love-progress").style.width = scrolled + "%";
+            const cards = document.querySelectorAll('.message-card');
+            const scrollBar = document.getElementById('scroll-progress');
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollBar.style.width = scrolled + "%";
 
-            document.querySelectorAll('.card').forEach(card => {
-                let pos = card.getBoundingClientRect().top;
-                if(pos < window.innerHeight - 100) card.classList.add('visible');
+            cards.forEach(card => {
+                const cardTop = card.getBoundingClientRect().top;
+                if (cardTop < window.innerHeight - 100) card.classList.add('visible');
             });
         });
 
         // --- Celebration ---
-        function celebrate() {
-            const count = 200,
-            defaults = { origin: { y: 0.7 } };
-
-            function fire(particleRatio, opts) {
-                confetti(Object.assign({}, defaults, opts, {
-                    particleCount: Math.floor(count * particleRatio)
-                }));
-            }
-
-            fire(0.25, { spread: 26, startVelocity: 55 });
-            fire(0.2, { spread: 60 });
-            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-            fire(0.1, { spread: 120, startVelocity: 45 });
-            
+        function deployCelebration() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#00f3ff', '#ff007f', '#39ff14']
+            });
             setTimeout(() => {
-                alert("Has ejecutado 'amor_eterno.exe'. No hay vuelta atrás, te amo para siempre. ❤️");
+                alert("Has ejecutado 'amor_eterno.exe'. Te amo con todo mi sistema operativo. ❤️");
             }, 500);
         }
     </script>
